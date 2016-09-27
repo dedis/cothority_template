@@ -49,18 +49,21 @@ func (e *simulation) Setup(dir string, hosts []string) (
 func (e *simulation) Run(config *sda.SimulationConfig) error {
 	size := config.Tree.Size()
 	log.Lvl2("Size is:", size, "rounds:", e.Rounds)
+	service, ok := config.GetService(ServiceName).(*Service)
+	if service == nil || !ok {
+		log.Fatal("Didn't find service", ServiceName)
+	}
 	for round := 0; round < e.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
-		service, ok := config.GetService(ServiceName).(*Service)
-		if service == nil || !ok {
-			log.Fatal("Didn't find service", ServiceName)
-		}
 		ret, err := service.ClockRequest(nil, &ClockRequest{Roster: config.Roster})
 		if err != nil {
 			log.Error(err)
 		}
 		resp, ok := ret.(*ClockResponse)
+		if !ok {
+			log.Fatal("Didn't get a ClockResponse")
+		}
 		if resp.Time <= 0 {
 			log.Error("0 time elapsed")
 		}
