@@ -12,8 +12,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestServiceTemplate(t *testing.T) {
-	defer log.AfterTest(t)
-	log.TestOutput(testing.Verbose(), 4)
 	local := sda.NewLocalTest()
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
