@@ -35,7 +35,7 @@ func (c *Client) Clock(r *sda.Roster) (time.Duration, error) {
 	log.Lvl4("Sending message to", dst)
 	now := time.Now()
 	reply, err := c.Send(dst, &CountRequest{})
-	if e := sda.ErrMsg(reply, err); e != nil {
+	if e := network.ErrMsg(reply, err); e != nil {
 		return time.Duration(0), e
 	}
 	_, ok := reply.Msg.(CountResponse)
@@ -49,7 +49,7 @@ func (c *Client) Clock(r *sda.Roster) (time.Duration, error) {
 // service-node.
 func (c *Client) Count(si *network.ServerIdentity) (int, error) {
 	reply, err := c.Send(si, &CountRequest{})
-	if e := sda.ErrMsg(reply, err); e != nil {
+	if e := network.ErrMsg(reply, err); e != nil {
 		return -1, e
 	}
 	cr, ok := reply.Msg.(CountResponse)

@@ -26,7 +26,7 @@ func TestNode(t *testing.T) {
 	local := sda.NewLocalTest()
 	nodes := []int{2, 5, 13}
 	for _, nbrNodes := range nodes {
-		_, _, tree := local.GenTree(nbrNodes, false, true, true)
+		_, _, tree := local.GenTree(nbrNodes, true)
 		log.Lvl3(tree.Dump())
 
 		pi, err := local.StartProtocol("Template", tree)
