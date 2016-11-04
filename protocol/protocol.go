@@ -71,6 +71,8 @@ func (p *ProtocolTemplate) HandleAnnounce(msg StructAnnounce) error {
 // HandleReply is the message going up the tree and holding a counter
 // to verify the number of nodes.
 func (p *ProtocolTemplate) HandleReply(reply []StructReply) error {
+	defer p.Done()
+
 	children := 1
 	for _, c := range reply {
 		children += c.ChildrenCount
