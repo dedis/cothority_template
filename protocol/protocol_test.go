@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
 	"github.com/dedis/cothority_template/protocol"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
+	"github.com/dedis/onet/sda"
 )
 
 func TestMain(m *testing.M) {

@@ -13,9 +13,9 @@ node will only use the `Handle`-methods, and not call `Start` again.
 import (
 	"errors"
 
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
+	"github.com/dedis/onet/sda"
 )
 
 func init() {

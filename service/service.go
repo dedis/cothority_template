@@ -8,10 +8,10 @@ runs on the node.
 import (
 	"time"
 
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
 	"github.com/dedis/cothority_template/protocol"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
+	"github.com/dedis/onet/sda"
 )
 
 // ServiceName is the name to refer to the Template service from another
@@ -33,12 +33,12 @@ type Service struct {
 }
 
 // ClockRequest starts a template-protocol and returns the run-time.
-func (s *Service) ClockRequest(e *network.ServerIdentity, req *ClockRequest) (network.Body, error) {
+func (s *Service) ClockRequest(req *ClockRequest) (network.Body, sda.ClientError) {
 	s.Count++
 	tree := req.Roster.GenerateBinaryTree()
 	pi, err := s.CreateProtocolSDA(template.Name, tree)
 	if err != nil {
-		return nil, err
+		return nil, sda.NewClientError(err)
 	}
 	start := time.Now()
 	pi.Start()
@@ -48,7 +48,7 @@ func (s *Service) ClockRequest(e *network.ServerIdentity, req *ClockRequest) (ne
 }
 
 // CountRequest returns the number of instantiations of the protocol.
-func (s *Service) CountRequest(e *network.ServerIdentity, req *CountRequest) (network.Body, error) {
+func (s *Service) CountRequest(req *CountRequest) (network.Body, sda.ClientError) {
 	return &CountResponse{s.Count}, nil
 }
 

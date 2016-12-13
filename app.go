@@ -7,7 +7,7 @@ package main
 import (
 	"os"
 
-	"github.com/dedis/cothority/log"
+	"github.com/dedis/onet/log"
 	"gopkg.in/urfave/cli.v1"
 )
 

@@ -24,13 +24,13 @@ import (
 	"strconv"
 
 	"github.com/BurntSushi/toml"
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/monitor"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/monitor"
+	"github.com/dedis/onet/sda"
 )
 
 func init() {
-	sda.SimulationRegister("Template", NewSimulation)
+	sda.SimulationRegister("TemplateProtocol", NewSimulation)
 }
 
 // Simulation implements sda.Simulation.

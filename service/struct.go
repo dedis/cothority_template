@@ -5,8 +5,8 @@ This holds the messages used to communicate with the service over the network.
 */
 
 import (
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet/network"
+	"github.com/dedis/onet/sda"
 )
 
 // We need to register all messages so the network knows how to handle them.

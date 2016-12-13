@@ -9,7 +9,7 @@ DBG_SRV=0
 # Needs 4 clients
 NBR=4
 
-TESTPATH=$GOPATH/src/github.com/dedis/cothority/app/lib/test
+TESTPATH=$GOPATH/src/github.com/dedis/onet/app/lib/test
 . $TESTPATH/libtest.sh
 . $TESTPATH/cothorityd.sh
 

@@ -2,9 +2,9 @@ package template
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/monitor"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/monitor"
+	"github.com/dedis/onet/sda"
 )
 
 /*
@@ -13,7 +13,7 @@ import (
  */
 
 func init() {
-	sda.SimulationRegister("ServiceTemplate", NewSimulation)
+	sda.SimulationRegister("TemplateService", NewSimulation)
 }
 
 // Simulation only holds the BFTree simulation
@@ -56,7 +56,7 @@ func (e *simulation) Run(config *sda.SimulationConfig) error {
 	for round := 0; round < e.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
-		ret, err := service.ClockRequest(nil, &ClockRequest{Roster: config.Roster})
+		ret, err := service.ClockRequest(&ClockRequest{Roster: config.Roster})
 		if err != nil {
 			log.Error(err)
 		}

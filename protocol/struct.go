@@ -7,7 +7,7 @@ with the `*sda.TreeNode` embedded. The latter is used in the handler-function
 so that it can find out who sent the message.
 */
 
-import "github.com/dedis/cothority/sda"
+import "github.com/dedis/onet/sda"
 
 // Name can be used from other packages to refer to this protocol.
 const Name = "Template"

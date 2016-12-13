@@ -3,8 +3,8 @@ package template
 import (
 	"testing"
 
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/sda"
 )
 
 func TestMain(m *testing.M) {
