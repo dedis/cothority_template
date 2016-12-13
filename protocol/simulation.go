@@ -25,8 +25,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/dedis/onet/log"
-	"github.com/dedis/onet/monitor"
 	"github.com/dedis/onet/sda"
+	"github.com/dedis/onet/simul/monitor"
 )
 
 func init() {
