@@ -3,20 +3,20 @@ package template
 import (
 	"testing"
 
+	"github.com/dedis/onet"
 	"github.com/dedis/onet/log"
-	"github.com/dedis/onet/sda"
 )
 
 func TestMain(m *testing.M) {
 	log.MainTest(m)
 }
 
-func NewTestClient(lt *sda.LocalTest) *Client {
-	return &Client{Client: lt.NewClient(ServiceName)}
+func NewTestClient(lt *onet.LocalTest) *Client {
+	return &Client{Client: lt.NewClient(Name)}
 }
 
 func TestServiceTemplate(t *testing.T) {
-	local := sda.NewLocalTest()
+	local := onet.NewTCPTest()
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
 	_, el, _ := local.GenTree(5, true)

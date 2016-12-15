@@ -11,24 +11,24 @@ This part of the service runs on the client or the app.
 import (
 	"time"
 
+	"github.com/dedis/onet"
 	"github.com/dedis/onet/log"
 	"github.com/dedis/onet/network"
-	"github.com/dedis/onet/sda"
 )
 
 // Client is a structure to communicate with the CoSi
 // service
 type Client struct {
-	*sda.Client
+	*onet.Client
 }
 
 // NewClient instantiates a new cosi.Client
 func NewClient() *Client {
-	return &Client{Client: sda.NewClient(ServiceName)}
+	return &Client{Client: onet.NewClient(Name)}
 }
 
 // Clock will return the time in seconds it took to run the protocol.
-func (c *Client) Clock(r *sda.Roster) (time.Duration, error) {
+func (c *Client) Clock(r *onet.Roster) (time.Duration, error) {
 	dst := r.RandomServerIdentity()
 	log.Lvl4("Sending message to", dst)
 	now := time.Now()

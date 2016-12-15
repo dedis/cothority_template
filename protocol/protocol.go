@@ -13,28 +13,28 @@ node will only use the `Handle`-methods, and not call `Start` again.
 import (
 	"errors"
 
+	"github.com/dedis/onet"
 	"github.com/dedis/onet/log"
 	"github.com/dedis/onet/network"
-	"github.com/dedis/onet/sda"
 )
 
 func init() {
 	network.RegisterPacketType(Announce{})
 	network.RegisterPacketType(Reply{})
-	sda.GlobalProtocolRegister(Name, NewProtocol)
+	onet.GlobalProtocolRegister(Name, NewProtocol)
 }
 
 // ProtocolTemplate just holds a message that is passed to all children. It
 // also defines a channel that will receive the number of children. Only the
 // root-node will write to the channel.
 type ProtocolTemplate struct {
-	*sda.TreeNodeInstance
+	*onet.TreeNodeInstance
 	Message    string
 	ChildCount chan int
 }
 
 // NewProtocol initialises the structure for use in one round
-func NewProtocol(n *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
+func NewProtocol(n *onet.TreeNodeInstance) (onet.ProtocolInstance, error) {
 	t := &ProtocolTemplate{
 		TreeNodeInstance: n,
 		ChildCount:       make(chan int),

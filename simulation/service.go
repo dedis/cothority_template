@@ -1,9 +1,10 @@
-package template
+package main
 
 import (
 	"github.com/BurntSushi/toml"
+	"github.com/dedis/cothority_template/service"
+	"github.com/dedis/onet"
 	"github.com/dedis/onet/log"
-	"github.com/dedis/onet/sda"
 	"github.com/dedis/onet/simul/monitor"
 )
 
@@ -13,17 +14,17 @@ import (
  */
 
 func init() {
-	sda.SimulationRegister("TemplateService", NewSimulation)
+	onet.SimulationRegister("TemplateService", NewSimulationService)
 }
 
 // Simulation only holds the BFTree simulation
 type simulation struct {
-	sda.SimulationBFTree
+	onet.SimulationBFTree
 }
 
-// NewSimulation returns the new simulation, where all fields are
+// NewSimulationService returns the new simulation, where all fields are
 // initialised using the config-file
-func NewSimulation(config string) (sda.Simulation, error) {
+func NewSimulationService(config string) (onet.Simulation, error) {
 	es := &simulation{}
 	_, err := toml.Decode(config, es)
 	if err != nil {
@@ -34,8 +35,8 @@ func NewSimulation(config string) (sda.Simulation, error) {
 
 // Setup creates the tree used for that simulation
 func (e *simulation) Setup(dir string, hosts []string) (
-	*sda.SimulationConfig, error) {
-	sc := &sda.SimulationConfig{}
+	*onet.SimulationConfig, error) {
+	sc := &onet.SimulationConfig{}
 	e.CreateRoster(sc, hosts, 2000)
 	err := e.CreateTree(sc)
 	if err != nil {
@@ -46,21 +47,21 @@ func (e *simulation) Setup(dir string, hosts []string) (
 
 // Run is used on the destination machines and runs a number of
 // rounds
-func (e *simulation) Run(config *sda.SimulationConfig) error {
+func (e *simulation) Run(config *onet.SimulationConfig) error {
 	size := config.Tree.Size()
 	log.Lvl2("Size is:", size, "rounds:", e.Rounds)
-	service, ok := config.GetService(ServiceName).(*Service)
+	service, ok := config.GetService(template.Name).(*template.Service)
 	if service == nil || !ok {
-		log.Fatal("Didn't find service", ServiceName)
+		log.Fatal("Didn't find service", template.Name)
 	}
 	for round := 0; round < e.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
-		ret, err := service.ClockRequest(&ClockRequest{Roster: config.Roster})
+		ret, err := service.ClockRequest(&template.ClockRequest{Roster: config.Roster})
 		if err != nil {
 			log.Error(err)
 		}
-		resp, ok := ret.(*ClockResponse)
+		resp, ok := ret.(*template.ClockResponse)
 		if !ok {
 			log.Fatal("Didn't get a ClockResponse")
 		}

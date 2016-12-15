@@ -3,11 +3,11 @@ package template
 /*
 Struct holds the messages that will be sent around in the protocol. You have
 to define each message twice: once the actual message, and a second time
-with the `*sda.TreeNode` embedded. The latter is used in the handler-function
+with the `*onet.TreeNode` embedded. The latter is used in the handler-function
 so that it can find out who sent the message.
 */
 
-import "github.com/dedis/onet/sda"
+import "github.com/dedis/onet"
 
 // Name can be used from other packages to refer to this protocol.
 const Name = "Template"
@@ -20,7 +20,7 @@ type Announce struct {
 // StructAnnounce just contains Announce and the data necessary to identify and
 // process the message in the sda framework.
 type StructAnnounce struct {
-	*sda.TreeNode
+	*onet.TreeNode
 	Announce
 }
 
@@ -32,6 +32,6 @@ type Reply struct {
 // StructReply just contains Reply and the data necessary to identify and
 // process the message in the sda framework.
 type StructReply struct {
-	*sda.TreeNode
+	*onet.TreeNode
 	Reply
 }
