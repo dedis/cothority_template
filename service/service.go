@@ -36,7 +36,7 @@ type Service struct {
 func (s *Service) ClockRequest(req *ClockRequest) (network.Body, onet.ClientError) {
 	s.Count++
 	tree := req.Roster.GenerateBinaryTree()
-	pi, err := s.CreateProtocolSDA(template.Name, tree)
+	pi, err := s.CreateProtocolOnet(template.Name, tree)
 	if err != nil {
 		return nil, onet.NewClientError(err)
 	}
