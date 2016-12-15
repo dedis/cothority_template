@@ -8,37 +8,37 @@ runs on the node.
 import (
 	"time"
 
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
 	"github.com/dedis/cothority_template/protocol"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
 )
 
-// ServiceName is the name to refer to the Template service from another
+// Name is the name to refer to the Template service from another
 // package.
-const ServiceName = "Template"
+const Name = "Template"
 
 func init() {
-	sda.RegisterNewService(ServiceName, newService)
+	onet.RegisterNewService(Name, newService)
 }
 
 // Service is our template-service
 type Service struct {
 	// We need to embed the ServiceProcessor, so that incoming messages
 	// are correctly handled.
-	*sda.ServiceProcessor
+	*onet.ServiceProcessor
 	path string
 	// Count holds the number of calls to 'ClockRequest'
 	Count int
 }
 
 // ClockRequest starts a template-protocol and returns the run-time.
-func (s *Service) ClockRequest(e *network.ServerIdentity, req *ClockRequest) (network.Body, error) {
+func (s *Service) ClockRequest(req *ClockRequest) (network.Body, onet.ClientError) {
 	s.Count++
 	tree := req.Roster.GenerateBinaryTree()
-	pi, err := s.CreateProtocolSDA(template.Name, tree)
+	pi, err := s.CreateProtocolOnet(template.Name, tree)
 	if err != nil {
-		return nil, err
+		return nil, onet.NewClientError(err)
 	}
 	start := time.Now()
 	pi.Start()
@@ -48,7 +48,7 @@ func (s *Service) ClockRequest(e *network.ServerIdentity, req *ClockRequest) (ne
 }
 
 // CountRequest returns the number of instantiations of the protocol.
-func (s *Service) CountRequest(e *network.ServerIdentity, req *CountRequest) (network.Body, error) {
+func (s *Service) CountRequest(req *CountRequest) (network.Body, onet.ClientError) {
 	return &CountResponse{s.Count}, nil
 }
 
@@ -59,7 +59,7 @@ func (s *Service) CountRequest(e *network.ServerIdentity, req *CountRequest) (ne
 // instantiate the protocol on its own. If you need more control at the
 // instantiation of the protocol, use CreateProtocolService, and you can
 // give some extra-configuration to your protocol in here.
-func (s *Service) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
+func (s *Service) NewProtocol(tn *onet.TreeNodeInstance, conf *onet.GenericConfig) (onet.ProtocolInstance, error) {
 	log.Lvl3("Not templated yet")
 	return nil, nil
 }
@@ -67,12 +67,12 @@ func (s *Service) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig)
 // newTemplate receives the context and a path where it can write its
 // configuration, if desired. As we don't know when the service will exit,
 // we need to save the configuration on our own from time to time.
-func newService(c *sda.Context, path string) sda.Service {
+func newService(c *onet.Context, path string) onet.Service {
 	s := &Service{
-		ServiceProcessor: sda.NewServiceProcessor(c),
+		ServiceProcessor: onet.NewServiceProcessor(c),
 		path:             path,
 	}
-	if err := s.RegisterMessages(s.ClockRequest, s.CountRequest); err != nil {
+	if err := s.RegisterHandlers(s.ClockRequest, s.CountRequest); err != nil {
 		log.ErrFatal(err, "Couldn't register messages")
 	}
 	return s

@@ -9,38 +9,33 @@ This part of the service runs on the client or the app.
 */
 
 import (
-	"errors"
-
 	"time"
 
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
 )
 
 // Client is a structure to communicate with the CoSi
 // service
 type Client struct {
-	*sda.Client
+	*onet.Client
 }
 
 // NewClient instantiates a new cosi.Client
 func NewClient() *Client {
-	return &Client{Client: sda.NewClient(ServiceName)}
+	return &Client{Client: onet.NewClient(Name)}
 }
 
 // Clock will return the time in seconds it took to run the protocol.
-func (c *Client) Clock(r *sda.Roster) (time.Duration, error) {
+func (c *Client) Clock(r *onet.Roster) (time.Duration, error) {
 	dst := r.RandomServerIdentity()
 	log.Lvl4("Sending message to", dst)
 	now := time.Now()
-	reply, err := c.Send(dst, &CountRequest{})
-	if e := network.ErrMsg(reply, err); e != nil {
-		return time.Duration(0), e
-	}
-	_, ok := reply.Msg.(CountResponse)
-	if !ok {
-		return time.Duration(0), errors.New("Wrong return-type.")
+	reply := &CountResponse{}
+	err := c.SendProtobuf(dst, &CountRequest{}, reply)
+	if err != nil {
+		return time.Duration(0), err
 	}
 	return time.Now().Sub(now), nil
 }
@@ -48,13 +43,10 @@ func (c *Client) Clock(r *sda.Roster) (time.Duration, error) {
 // Count will return the number of times `Clock` has been called on this
 // service-node.
 func (c *Client) Count(si *network.ServerIdentity) (int, error) {
-	reply, err := c.Send(si, &CountRequest{})
-	if e := network.ErrMsg(reply, err); e != nil {
-		return -1, e
+	reply := &CountResponse{}
+	err := c.SendProtobuf(si, &CountRequest{}, reply)
+	if err != nil {
+		return -1, err
 	}
-	cr, ok := reply.Msg.(CountResponse)
-	if !ok {
-		return -1, errors.New("Wrong return-type.")
-	}
-	return cr.Count, nil
+	return reply.Count, nil
 }

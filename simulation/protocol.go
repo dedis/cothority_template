@@ -1,4 +1,4 @@
-package template
+package main
 
 /*
 The simulation-file can be used with the `cothority/simul` and be run either
@@ -24,23 +24,24 @@ import (
 	"strconv"
 
 	"github.com/BurntSushi/toml"
-	"github.com/dedis/cothority/log"
-	"github.com/dedis/cothority/monitor"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/cothority_template/protocol"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/simul/monitor"
 )
 
 func init() {
-	sda.SimulationRegister("Template", NewSimulation)
+	onet.SimulationRegister("TemplateProtocol", NewSimulationProtocol)
 }
 
-// Simulation implements sda.Simulation.
+// Simulation implements onet.Simulation.
 type Simulation struct {
-	sda.SimulationBFTree
+	onet.SimulationBFTree
 }
 
-// NewSimulation is used internally to register the simulation (see the init()
+// NewSimulationProtocol is used internally to register the simulation (see the init()
 // function above).
-func NewSimulation(config string) (sda.Simulation, error) {
+func NewSimulationProtocol(config string) (onet.Simulation, error) {
 	es := &Simulation{}
 	_, err := toml.Decode(config, es)
 	if err != nil {
@@ -49,10 +50,10 @@ func NewSimulation(config string) (sda.Simulation, error) {
 	return es, nil
 }
 
-// Setup implements sda.Simulation.
+// Setup implements onet.Simulation.
 func (e *Simulation) Setup(dir string, hosts []string) (
-	*sda.SimulationConfig, error) {
-	sc := &sda.SimulationConfig{}
+	*onet.SimulationConfig, error) {
+	sc := &onet.SimulationConfig{}
 	e.CreateRoster(sc, hosts, 2000)
 	err := e.CreateTree(sc)
 	if err != nil {
@@ -65,23 +66,23 @@ func (e *Simulation) Setup(dir string, hosts []string) (
 // by the server. Here we call the 'Node'-method of the
 // SimulationBFTree structure which will load the roster- and the
 // tree-structure to speed up the first round.
-func (e *Simulation) Node(config *sda.SimulationConfig) error {
+func (e *Simulation) Node(config *onet.SimulationConfig) error {
 	return e.SimulationBFTree.Node(config)
 }
 
-// Run implements sda.Simulation.
-func (e *Simulation) Run(config *sda.SimulationConfig) error {
+// Run implements onet.Simulation.
+func (e *Simulation) Run(config *onet.SimulationConfig) error {
 	size := config.Tree.Size()
 	log.Lvl2("Size is:", size, "rounds:", e.Rounds)
 	for round := 0; round < e.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
-		p, err := config.Overlay.CreateProtocolSDA("Template", config.Tree)
+		p, err := config.Overlay.CreateProtocolOnet("Template", config.Tree)
 		if err != nil {
 			return err
 		}
 		go p.Start()
-		children := <-p.(*ProtocolTemplate).ChildCount
+		children := <-p.(*template.ProtocolTemplate).ChildCount
 		round.Record()
 		if children != size {
 			return errors.New("Didn't get " + strconv.Itoa(size) +

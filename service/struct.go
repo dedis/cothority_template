@@ -5,8 +5,8 @@ This holds the messages used to communicate with the service over the network.
 */
 
 import (
-	"github.com/dedis/cothority/network"
-	"github.com/dedis/cothority/sda"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/network"
 )
 
 // We need to register all messages so the network knows how to handle them.
@@ -22,7 +22,7 @@ func init() {
 // ClockRequest will run the tepmlate-protocol on the roster and return
 // the time spent doing so.
 type ClockRequest struct {
-	Roster *sda.Roster
+	Roster *onet.Roster
 }
 
 // ClockResponse returns the time spent for the protocol-run.
