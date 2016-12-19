@@ -7,6 +7,9 @@ package main
 import (
 	"os"
 
+	"github.com/dedis/cothority_template/service"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/app/config"
 	"github.com/dedis/onet/log"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -16,13 +19,21 @@ func main() {
 	app.Name = "Template"
 	app.Usage = "Used for building other apps."
 	app.Version = "0.1"
+	groupsDef := "the group-definition-file"
 	app.Commands = []cli.Command{
 		{
-			Name:      "main",
-			Usage:     "main command",
-			Aliases:   []string{"m"},
-			ArgsUsage: "additional parameters",
-			Action:    cmdMain,
+			Name:      "time",
+			Usage:     "measure the time to contact all nodes",
+			Aliases:   []string{"t"},
+			ArgsUsage: groupsDef,
+			Action:    cmdTime,
+		},
+		{
+			Name:      "counter",
+			Usage:     "return the counter",
+			Aliases:   []string{"t"},
+			ArgsUsage: groupsDef,
+			Action:    cmdCounter,
 		},
 	}
 	app.Flags = []cli.Flag{
@@ -40,8 +51,44 @@ func main() {
 
 }
 
-// Main command.
-func cmdMain(c *cli.Context) error {
-	log.Info("Main command")
+// Returns the time needed to contact all nodes.
+func cmdTime(c *cli.Context) error {
+	log.Info("Time command")
+	roster := readGroup(c)
+	client := template.NewClient()
+	resp, err := client.Clock(roster)
+	if err != nil {
+		log.Fatal("When asking the time:", err)
+	}
+	log.Infof("Children: %d - Time spent: %f", resp.Children, resp.Time)
 	return nil
+}
+
+// Returns the number of calls.
+func cmdCounter(c *cli.Context) error {
+	log.Info("Counter command")
+	roster := readGroup(c)
+	client := template.NewClient()
+	resp, err := client.Count(roster)
+	if err != nil {
+		log.Fatal("When asking for counter:", err)
+	}
+	log.Info("Number of requests:", resp.Count)
+	return nil
+}
+
+func readGroup(c *cli.Context) *onet.Roster {
+	if c.NArg() != 1 {
+		log.Fatal("Please give the group-file as argument")
+	}
+	name := c.Args().First()
+	f, err := os.Open(name)
+	log.ErrFatal(err, "Couldn't open group definition file")
+	group, err := config.ReadGroupDescToml(f)
+	log.ErrFatal(err, "Error while reading group definition file", err)
+	if len(group.Roster.List) == 0 {
+		log.ErrFatalf(err, "Empty entity or invalid group defintion in: %s",
+			name)
+	}
+	return group
 }
