@@ -11,10 +11,6 @@ func TestMain(m *testing.M) {
 	log.MainTest(m)
 }
 
-func NewTestClient(lt *onet.LocalTest) *Client {
-	return &Client{Client: lt.NewClient(Name)}
-}
-
 func TestServiceTemplate(t *testing.T) {
 	local := onet.NewTCPTest()
 	// generate 5 hosts, they don't connect, they process messages, and they
@@ -23,7 +19,7 @@ func TestServiceTemplate(t *testing.T) {
 	defer local.CloseAll()
 
 	// Send a request to the service
-	client := NewTestClient(local)
+	client := NewClient()
 	log.Lvl1("Sending request to service...")
 	duration, err := client.Clock(el)
 	log.ErrFatal(err, "Couldn't send")

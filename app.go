@@ -7,8 +7,8 @@ package main
 import (
 	"os"
 
+	"github.com/dedis/cothority/libcothority"
 	"github.com/dedis/cothority_template/service"
-	"github.com/dedis/onet"
 	"github.com/dedis/onet/app/config"
 	"github.com/dedis/onet/log"
 	"gopkg.in/urfave/cli.v1"
@@ -37,26 +37,21 @@ func main() {
 		},
 	}
 	app.Flags = []cli.Flag{
-		cli.IntFlag{
-			Name:  "debug, d",
-			Value: 0,
-			Usage: "debug-level: 1 for terse, 5 for maximal",
-		},
+		libcothority.FlagDebug,
 	}
 	app.Before = func(c *cli.Context) error {
 		log.SetDebugVisible(c.Int("debug"))
 		return nil
 	}
 	app.Run(os.Args)
-
 }
 
 // Returns the time needed to contact all nodes.
 func cmdTime(c *cli.Context) error {
 	log.Info("Time command")
-	roster := readGroup(c)
+	group := readGroup(c)
 	client := template.NewClient()
-	resp, err := client.Clock(roster)
+	resp, err := client.Clock(group.Roster)
 	if err != nil {
 		log.Fatal("When asking the time:", err)
 	}
@@ -67,17 +62,17 @@ func cmdTime(c *cli.Context) error {
 // Returns the number of calls.
 func cmdCounter(c *cli.Context) error {
 	log.Info("Counter command")
-	roster := readGroup(c)
+	group := readGroup(c)
 	client := template.NewClient()
-	resp, err := client.Count(roster)
+	counter, err := client.Count(group.Roster.RandomServerIdentity())
 	if err != nil {
 		log.Fatal("When asking for counter:", err)
 	}
-	log.Info("Number of requests:", resp.Count)
+	log.Info("Number of requests:", counter)
 	return nil
 }
 
-func readGroup(c *cli.Context) *onet.Roster {
+func readGroup(c *cli.Context) *config.Group {
 	if c.NArg() != 1 {
 		log.Fatal("Please give the group-file as argument")
 	}
