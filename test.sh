@@ -8,7 +8,7 @@ DBG_APP=2
 
 main(){
     startTest
-    buildCothority include.go
+    buildCothority import.go
 	test Build
 	test Main
     stopTest
