@@ -13,7 +13,6 @@ NBR_CLIENTS=4
 
 main(){
     startTest
-    clientBuild
 #	test Build
 #	test Time
 	test Count
@@ -42,14 +41,6 @@ testBuild(){
 
 runApp(){
     dbgRun ./$APP -d $DBG_APP $@
-}
-
-clientBuild(){
-	appBuild
-	cothorityBuild service
-    addr1=127.0.0.1:2002
-    addr2=127.0.0.1:2004
-    addr3=127.0.0.1:2006
 }
 
 main
