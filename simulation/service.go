@@ -9,8 +9,7 @@ import (
 )
 
 /*
- * Defines the simulation for the service-template to be run with
- * `cothority/simul`.
+ * Defines the simulation for the service-template
  */
 
 func init() {
@@ -18,14 +17,14 @@ func init() {
 }
 
 // Simulation only holds the BFTree simulation
-type simulation struct {
+type SimulationService struct {
 	onet.SimulationBFTree
 }
 
 // NewSimulationService returns the new simulation, where all fields are
 // initialised using the config-file
 func NewSimulationService(config string) (onet.Simulation, error) {
-	es := &simulation{}
+	es := &SimulationService{}
 	_, err := toml.Decode(config, es)
 	if err != nil {
 		return nil, err
@@ -34,7 +33,7 @@ func NewSimulationService(config string) (onet.Simulation, error) {
 }
 
 // Setup creates the tree used for that simulation
-func (e *simulation) Setup(dir string, hosts []string) (
+func (e *SimulationService) Setup(dir string, hosts []string) (
 	*onet.SimulationConfig, error) {
 	sc := &onet.SimulationConfig{}
 	e.CreateRoster(sc, hosts, 2000)
@@ -45,9 +44,19 @@ func (e *simulation) Setup(dir string, hosts []string) (
 	return sc, nil
 }
 
+// Node can be used to initialize each node before it will be run
+// by the server. Here we call the 'Node'-method of the
+// SimulationBFTree structure which will load the roster- and the
+// tree-structure to speed up the first round.
+func (e *SimulationService) Node(config *onet.SimulationConfig) error {
+	index, _ := config.Roster.Search(config.Conode.ServerIdentity.ID)
+	log.Lvl1("Initializing node-index", index)
+	return e.SimulationBFTree.Node(config)
+}
+
 // Run is used on the destination machines and runs a number of
 // rounds
-func (e *simulation) Run(config *onet.SimulationConfig) error {
+func (e *SimulationService) Run(config *onet.SimulationConfig) error {
 	size := config.Tree.Size()
 	log.Lvl2("Size is:", size, "rounds:", e.Rounds)
 	service, ok := config.GetService(template.Name).(*template.Service)
