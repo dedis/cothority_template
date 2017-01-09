@@ -51,11 +51,11 @@ func NewSimulationProtocol(config string) (onet.Simulation, error) {
 }
 
 // Setup implements onet.Simulation.
-func (e *SimulationProtocol) Setup(dir string, hosts []string) (
+func (s *SimulationProtocol) Setup(dir string, hosts []string) (
 	*onet.SimulationConfig, error) {
 	sc := &onet.SimulationConfig{}
-	e.CreateRoster(sc, hosts, 2000)
-	err := e.CreateTree(sc)
+	s.CreateRoster(sc, hosts, 2000)
+	err := s.CreateTree(sc)
 	if err != nil {
 		return nil, err
 	}
@@ -66,17 +66,17 @@ func (e *SimulationProtocol) Setup(dir string, hosts []string) (
 // by the server. Here we call the 'Node'-method of the
 // SimulationBFTree structure which will load the roster- and the
 // tree-structure to speed up the first round.
-func (e *SimulationProtocol) Node(config *onet.SimulationConfig) error {
+func (s *SimulationProtocol) Node(config *onet.SimulationConfig) error {
 	index, _ := config.Roster.Search(config.Conode.ServerIdentity.ID)
-	log.Lvl1("Initializing node-index", index)
-	return e.SimulationBFTree.Node(config)
+	log.Lvl3("Initializing node-index", index)
+	return s.SimulationBFTree.Node(config)
 }
 
 // Run implements onet.Simulation.
-func (e *SimulationProtocol) Run(config *onet.SimulationConfig) error {
+func (s *SimulationProtocol) Run(config *onet.SimulationConfig) error {
 	size := config.Tree.Size()
-	log.Lvl2("Size is:", size, "rounds:", e.Rounds)
-	for round := 0; round < e.Rounds; round++ {
+	log.Lvl2("Size is:", size, "rounds:", s.Rounds)
+	for round := 0; round < s.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
 		p, err := config.Overlay.CreateProtocol("Template", config.Tree,
