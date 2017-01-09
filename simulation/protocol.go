@@ -68,6 +68,9 @@ func (s *SimulationProtocol) Setup(dir string, hosts []string) (
 // tree-structure to speed up the first round.
 func (s *SimulationProtocol) Node(config *onet.SimulationConfig) error {
 	index, _ := config.Roster.Search(config.Conode.ServerIdentity.ID)
+	if index < 0 {
+		log.Fatal("Didn't find this node in roster")
+	}
 	log.Lvl3("Initializing node-index", index)
 	return s.SimulationBFTree.Node(config)
 }
