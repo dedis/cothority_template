@@ -34,7 +34,7 @@ func init() {
 	onet.SimulationRegister("TemplateProtocol", NewSimulationProtocol)
 }
 
-// Simulation implements onet.Simulation.
+// SimulationProtocol implements onet.Simulation.
 type SimulationProtocol struct {
 	onet.SimulationBFTree
 }

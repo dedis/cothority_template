@@ -16,7 +16,7 @@ func init() {
 	onet.SimulationRegister("TemplateService", NewSimulationService)
 }
 
-// Simulation only holds the BFTree simulation
+// SimulationService only holds the BFTree simulation
 type SimulationService struct {
 	onet.SimulationBFTree
 }
