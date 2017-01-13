@@ -11,9 +11,9 @@ This part of the service runs on the client or the app.
 import (
 	"time"
 
-	"github.com/dedis/onet"
-	"github.com/dedis/onet/log"
-	"github.com/dedis/onet/network"
+	"gopkg.in/dedis/onet.v1"
+	"gopkg.in/dedis/onet.v1/log"
+	"gopkg.in/dedis/onet.v1/network"
 )
 
 // Client is a structure to communicate with the CoSi

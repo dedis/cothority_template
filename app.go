@@ -7,7 +7,7 @@ package main
 import (
 	"os"
 
-	"github.com/dedis/onet/log"
+	"gopkg.in/dedis/onet.v1/log"
 	"gopkg.in/urfave/cli.v1"
 )
 
