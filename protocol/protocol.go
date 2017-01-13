@@ -19,8 +19,8 @@ import (
 )
 
 func init() {
-	network.RegisterPacketType(Announce{})
-	network.RegisterPacketType(Reply{})
+	network.RegisterMessage(Announce{})
+	network.RegisterMessage(Reply{})
 	onet.GlobalProtocolRegister(Name, NewProtocol)
 }
 

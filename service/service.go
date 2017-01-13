@@ -33,7 +33,7 @@ type Service struct {
 }
 
 // ClockRequest starts a template-protocol and returns the run-time.
-func (s *Service) ClockRequest(req *ClockRequest) (network.Body, onet.ClientError) {
+func (s *Service) ClockRequest(req *ClockRequest) (network.Message, onet.ClientError) {
 	s.Count++
 	tree := req.Roster.GenerateBinaryTree()
 	pi, err := s.CreateProtocol(template.Name, tree)
@@ -48,7 +48,7 @@ func (s *Service) ClockRequest(req *ClockRequest) (network.Body, onet.ClientErro
 }
 
 // CountRequest returns the number of instantiations of the protocol.
-func (s *Service) CountRequest(req *CountRequest) (network.Body, onet.ClientError) {
+func (s *Service) CountRequest(req *CountRequest) (network.Message, onet.ClientError) {
 	return &CountResponse{s.Count}, nil
 }
 
@@ -67,10 +67,9 @@ func (s *Service) NewProtocol(tn *onet.TreeNodeInstance, conf *onet.GenericConfi
 // newTemplate receives the context and a path where it can write its
 // configuration, if desired. As we don't know when the service will exit,
 // we need to save the configuration on our own from time to time.
-func newService(c *onet.Context, path string) onet.Service {
+func newService(c *onet.Context) onet.Service {
 	s := &Service{
 		ServiceProcessor: onet.NewServiceProcessor(c),
-		path:             path,
 	}
 	if err := s.RegisterHandlers(s.ClockRequest, s.CountRequest); err != nil {
 		log.ErrFatal(err, "Couldn't register messages")
