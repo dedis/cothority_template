@@ -1,7 +1,7 @@
 # Template for a new cothority protocol/service/app
 
-Building on the CoNet-library available at 
-https://github.com/cothority/conet, this
+Building on the ONet-library available at 
+https://github.com/dedis/onet, this
 repo holds templates to build the different parts necessary for a cothority
 addition:
 
@@ -20,39 +20,39 @@ updated. We suppose you already forked the cothority-template repo into your
 account at `yourlogin`.
 
 ```bash
-go get -u github.com/cothority/template
-cd $GOPATH/src/github.com/cothority/template
+go get -u github.com/dedis/cothority_template
+cd $GOPATH/src/github.com/dedis/cothority_template
 git remote add perso git@github.com/yourlogin/template
 git checkout -b my_new_project
 git push -u perso my_new_project
 ```
 
-Now you can do all your development in `$GOPATH/src/github.com/cothority/template`
+Now you can do all your development in `$GOPATH/src/github.com/dedis/cothority_template`
 until you are proficient enough to move it either to the main-repository at
-`cothority/conode` or adjusting the paths and publish it under your own repo.
+`dedis/cothority` or adjusting the paths and publish it under your own repo.
 
 ## Documentation
 
 You find more documentation on how to use the template on the wiki:
-[Cothority Template](https://github.com/cothority/template/wiki)
+[Cothority Template](https://github.com/dedis/cothority_template/wiki)
 
 More documentation and examples can be found at:
 - To run and use a conode, have a look at 
-	[Cothority Node](https://github.com/cothority/conode/wiki)
+	[Cothority Node](https://github.com/dedis/cothority/wiki)
 	with examples of protocols, services and apps
 - To participate as a core-developer, go to 
-	[Cothority Network Library](https://github.com/cothority/conet/wiki)
+	[Cothority Network Library](https://github.com/dedis/onet/wiki)
 
 ## License
 
-All repositories in https://github.com/cothority are double-licensed under a 
+All repositories for the cothority are double-licensed under a 
 GNU/AGPL 3.0 and a commercial license. If you want to have more information, 
-contact us at bryan.ford@epfl.ch or linus.gassser@epfl.ch.
+contact us at dedis@epfl.ch.
 
 ## Contribution
 
 If you want to contribute to Cothority-ONet, please have a look at 
-[CONTRIBUTION](https://github.com/cothority/conode/blobl/master/CONTRIBUTION) for
+[CONTRIBUTION](https://github.com/dedis/cothority/blob/master/CONTRIBUTION) for
 licensing details. Once you are OK with those, you can have a look at our
 coding-guidelines in
 [Coding](https://github.com/dedis/Coding). In short, we use the github-issues
