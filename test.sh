@@ -1,47 +1,5 @@
 #!/usr/bin/env bash
 
-<<<<<<< HEAD
-DBG_SHOW=1
-# Debug-level for app
-DBG_APP=1
-DBG_SRV=1
-# Uncomment to build in local dir
-#STATICDIR=test
-# Needs 4 clients
-NBR_CLIENTS=4
-
-. $GOPATH/src/github.com/dedis/cothority/libcothority/cothority.sh
-
-main(){
-    startTest
-#	test Build
-#	test Time
-	test Count
-    stopTest
-}
-
-testCount(){
-	runCoBG 1 2
-	testFail runApp counter
-	testOK runApp counter group.toml
-	testGrep ": 0" runApp counter group.toml
-	runApp time group.toml
-	testGrep ": 1" runApp counter group.toml
-}
-
-testTime(){
-	runCoBG 1 2
-	testFail runApp time
-	testOK runApp time group.toml
-	testGrep Time runApp time group.toml
-}
-
-testBuild(){
-    testOK runApp --help
-}
-
-runApp(){
-=======
 DBG_TEST=1
 # Debug-level for app
 DBG_APP=2
@@ -50,14 +8,26 @@ DBG_APP=2
 
 main(){
     startTest
-    buildCothority
-	test Build
-	test Main
+    buildConode
+	test Count
+	test Time
     stopTest
 }
 
-testMain(){
-	testGrep Main runTmpl main
+testCount(){
+       runCoBG 1 2
+       testFail runTmpl counter
+       testOK runTmpl counter public.toml
+       testGrep ": 0" runTmpl counter public.toml
+       runTmpl time public.toml
+       testGrep ": 1" runTmpl counter public.toml
+}
+
+testTime(){
+       runCoBG 1 2
+       testFail runTmpl time
+       testOK runTmpl time public.toml
+       testGrep Time runTmpl time public.toml
 }
 
 testBuild(){
@@ -65,7 +35,6 @@ testBuild(){
 }
 
 runTmpl(){
->>>>>>> origin/master
     dbgRun ./$APP -d $DBG_APP $@
 }
 

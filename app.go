@@ -7,20 +7,19 @@ package main
 import (
 	"os"
 
-	"github.com/dedis/cothority/libcothority"
 	"github.com/dedis/cothority_template/service"
-	"github.com/dedis/onet/app/config"
+	"github.com/dedis/onet/app"
 	"github.com/dedis/onet/log"
 	"gopkg.in/urfave/cli.v1"
 )
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "Template"
-	app.Usage = "Used for building other apps."
-	app.Version = "0.1"
+	cliApp := cli.NewApp()
+	cliApp.Name = "Template"
+	cliApp.Usage = "Used for building other apps."
+	cliApp.Version = "0.1"
 	groupsDef := "the group-definition-file"
-	app.Commands = []cli.Command{
+	cliApp.Commands = []cli.Command{
 		{
 			Name:      "time",
 			Usage:     "measure the time to contact all nodes",
@@ -36,14 +35,14 @@ func main() {
 			Action:    cmdCounter,
 		},
 	}
-	app.Flags = []cli.Flag{
-		libcothority.FlagDebug,
+	cliApp.Flags = []cli.Flag{
+		app.FlagDebug,
 	}
-	app.Before = func(c *cli.Context) error {
+	cliApp.Before = func(c *cli.Context) error {
 		log.SetDebugVisible(c.Int("debug"))
 		return nil
 	}
-	app.Run(os.Args)
+	cliApp.Run(os.Args)
 }
 
 // Returns the time needed to contact all nodes.
@@ -72,14 +71,14 @@ func cmdCounter(c *cli.Context) error {
 	return nil
 }
 
-func readGroup(c *cli.Context) *config.Group {
+func readGroup(c *cli.Context) *app.Group {
 	if c.NArg() != 1 {
 		log.Fatal("Please give the group-file as argument")
 	}
 	name := c.Args().First()
 	f, err := os.Open(name)
 	log.ErrFatal(err, "Couldn't open group definition file")
-	group, err := config.ReadGroupDescToml(f)
+	group, err := app.ReadGroupDescToml(f)
 	log.ErrFatal(err, "Error while reading group definition file", err)
 	if len(group.Roster.List) == 0 {
 		log.ErrFatalf(err, "Empty entity or invalid group defintion in: %s",
