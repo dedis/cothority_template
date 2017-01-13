@@ -42,9 +42,11 @@ func (s *Service) ClockRequest(req *ClockRequest) (network.Message, onet.ClientE
 	}
 	start := time.Now()
 	pi.Start()
-	<-pi.(*template.ProtocolTemplate).ChildCount
-	elapsed := time.Now().Sub(start).Seconds()
-	return &ClockResponse{elapsed}, nil
+	resp := &ClockResponse{
+		Children: <-pi.(*template.ProtocolTemplate).ChildCount,
+	}
+	resp.Time = time.Now().Sub(start).Seconds()
+	return resp, nil
 }
 
 // CountRequest returns the number of instantiations of the protocol.
@@ -55,7 +57,7 @@ func (s *Service) CountRequest(req *CountRequest) (network.Message, onet.ClientE
 // NewProtocol is called on all nodes of a Tree (except the root, since it is
 // the one starting the protocol) so it's the Service that will be called to
 // generate the PI on all others node.
-// If you use CreateProtocolSDA, this will not be called, as the SDA will
+// If you use CreateProtocolOnet, this will not be called, as the Onet will
 // instantiate the protocol on its own. If you need more control at the
 // instantiation of the protocol, use CreateProtocolService, and you can
 // give some extra-configuration to your protocol in here.

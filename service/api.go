@@ -9,8 +9,6 @@ This part of the service runs on the client or the app.
 */
 
 import (
-	"time"
-
 	"gopkg.in/dedis/onet.v1"
 	"gopkg.in/dedis/onet.v1/log"
 	"gopkg.in/dedis/onet.v1/network"
@@ -28,16 +26,15 @@ func NewClient() *Client {
 }
 
 // Clock will return the time in seconds it took to run the protocol.
-func (c *Client) Clock(r *onet.Roster) (time.Duration, error) {
+func (c *Client) Clock(r *onet.Roster) (*ClockResponse, onet.ClientError) {
 	dst := r.RandomServerIdentity()
 	log.Lvl4("Sending message to", dst)
-	now := time.Now()
-	reply := &CountResponse{}
-	err := c.SendProtobuf(dst, &CountRequest{}, reply)
+	reply := &ClockResponse{}
+	err := c.SendProtobuf(dst, &ClockRequest{r}, reply)
 	if err != nil {
-		return time.Duration(0), err
+		return nil, err
 	}
-	return time.Now().Sub(now), nil
+	return reply, nil
 }
 
 // Count will return the number of times `Clock` has been called on this

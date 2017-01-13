@@ -27,7 +27,8 @@ type ClockRequest struct {
 
 // ClockResponse returns the time spent for the protocol-run.
 type ClockResponse struct {
-	Time float64
+	Time     float64
+	Children int
 }
 
 // CountRequest will return how many times the protocol has been run.
