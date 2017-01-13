@@ -34,15 +34,15 @@ func init() {
 	onet.SimulationRegister("TemplateProtocol", NewSimulationProtocol)
 }
 
-// Simulation implements onet.Simulation.
-type Simulation struct {
+// SimulationProtocol implements onet.Simulation.
+type SimulationProtocol struct {
 	onet.SimulationBFTree
 }
 
 // NewSimulationProtocol is used internally to register the simulation (see the init()
 // function above).
 func NewSimulationProtocol(config string) (onet.Simulation, error) {
-	es := &Simulation{}
+	es := &SimulationProtocol{}
 	_, err := toml.Decode(config, es)
 	if err != nil {
 		return nil, err
@@ -51,11 +51,11 @@ func NewSimulationProtocol(config string) (onet.Simulation, error) {
 }
 
 // Setup implements onet.Simulation.
-func (e *Simulation) Setup(dir string, hosts []string) (
+func (s *SimulationProtocol) Setup(dir string, hosts []string) (
 	*onet.SimulationConfig, error) {
 	sc := &onet.SimulationConfig{}
-	e.CreateRoster(sc, hosts, 2000)
-	err := e.CreateTree(sc)
+	s.CreateRoster(sc, hosts, 2000)
+	err := s.CreateTree(sc)
 	if err != nil {
 		return nil, err
 	}
@@ -66,18 +66,24 @@ func (e *Simulation) Setup(dir string, hosts []string) (
 // by the server. Here we call the 'Node'-method of the
 // SimulationBFTree structure which will load the roster- and the
 // tree-structure to speed up the first round.
-func (e *Simulation) Node(config *onet.SimulationConfig) error {
-	return e.SimulationBFTree.Node(config)
+func (s *SimulationProtocol) Node(config *onet.SimulationConfig) error {
+	index, _ := config.Roster.Search(config.Server.ServerIdentity.ID)
+	if index < 0 {
+		log.Fatal("Didn't find this node in roster")
+	}
+	log.Lvl3("Initializing node-index", index)
+	return s.SimulationBFTree.Node(config)
 }
 
 // Run implements onet.Simulation.
-func (e *Simulation) Run(config *onet.SimulationConfig) error {
+func (s *SimulationProtocol) Run(config *onet.SimulationConfig) error {
 	size := config.Tree.Size()
-	log.Lvl2("Size is:", size, "rounds:", e.Rounds)
-	for round := 0; round < e.Rounds; round++ {
+	log.Lvl2("Size is:", size, "rounds:", s.Rounds)
+	for round := 0; round < s.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
-		p, err := config.Overlay.CreateProtocolOnet("Template", config.Tree)
+		p, err := config.Overlay.CreateProtocol("Template", config.Tree,
+			onet.NilServiceID)
 		if err != nil {
 			return err
 		}

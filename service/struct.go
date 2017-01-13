@@ -15,7 +15,7 @@ func init() {
 		CountRequest{}, CountResponse{},
 		ClockRequest{}, ClockResponse{},
 	} {
-		network.RegisterPacketType(msg)
+		network.RegisterMessage(msg)
 	}
 }
 
