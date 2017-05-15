@@ -7,9 +7,10 @@ package main
 import (
 	"os"
 
+	template "github.com/dedis/cothority_template"
+
 	"gopkg.in/dedis/onet.v1/app"
 
-	"github.com/dedis/cothority_template/service"
 	"gopkg.in/dedis/onet.v1/log"
 	"gopkg.in/urfave/cli.v1"
 )

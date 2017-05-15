@@ -1,4 +1,4 @@
-package template
+package protocol
 
 /*
 The `NewProtocol` method is used to define the protocol and to register
@@ -24,10 +24,10 @@ func init() {
 	onet.GlobalProtocolRegister(Name, NewProtocol)
 }
 
-// ProtocolTemplate just holds a message that is passed to all children. It
+// Template just holds a message that is passed to all children. It
 // also defines a channel that will receive the number of children. Only the
 // root-node will write to the channel.
-type ProtocolTemplate struct {
+type Template struct {
 	*onet.TreeNodeInstance
 	Message    string
 	ChildCount chan int
@@ -35,7 +35,7 @@ type ProtocolTemplate struct {
 
 // NewProtocol initialises the structure for use in one round
 func NewProtocol(n *onet.TreeNodeInstance) (onet.ProtocolInstance, error) {
-	t := &ProtocolTemplate{
+	t := &Template{
 		TreeNodeInstance: n,
 		ChildCount:       make(chan int),
 	}
@@ -48,7 +48,7 @@ func NewProtocol(n *onet.TreeNodeInstance) (onet.ProtocolInstance, error) {
 }
 
 // Start sends the Announce-message to all children
-func (p *ProtocolTemplate) Start() error {
+func (p *Template) Start() error {
 	log.Lvl3("Starting Template")
 	return p.HandleAnnounce(StructAnnounce{p.TreeNode(),
 		Announce{"cothority rulez!"}})
@@ -56,7 +56,7 @@ func (p *ProtocolTemplate) Start() error {
 
 // HandleAnnounce is the first message and is used to send an ID that
 // is stored in all nodes.
-func (p *ProtocolTemplate) HandleAnnounce(msg StructAnnounce) error {
+func (p *Template) HandleAnnounce(msg StructAnnounce) error {
 	p.Message = msg.Message
 	if !p.IsLeaf() {
 		// If we have children, send the same message to all of them
@@ -70,7 +70,7 @@ func (p *ProtocolTemplate) HandleAnnounce(msg StructAnnounce) error {
 
 // HandleReply is the message going up the tree and holding a counter
 // to verify the number of nodes.
-func (p *ProtocolTemplate) HandleReply(reply []StructReply) error {
+func (p *Template) HandleReply(reply []StructReply) error {
 	defer p.Done()
 
 	children := 1

@@ -88,7 +88,7 @@ func (s *SimulationProtocol) Run(config *onet.SimulationConfig) error {
 			return err
 		}
 		go p.Start()
-		children := <-p.(*template.ProtocolTemplate).ChildCount
+		children := <-p.(*protocol.Template).ChildCount
 		round.Record()
 		if children != size {
 			return errors.New("Didn't get " + strconv.Itoa(size) +

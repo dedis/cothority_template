@@ -1,4 +1,4 @@
-package template
+package service
 
 /*
 The service.go defines what to do for each API-call. This part of the service
@@ -8,18 +8,19 @@ runs on the node.
 import (
 	"time"
 
+	"github.com/dedis/cothority_template"
 	"github.com/dedis/cothority_template/protocol"
 	"gopkg.in/dedis/onet.v1"
 	"gopkg.in/dedis/onet.v1/log"
-	"gopkg.in/dedis/onet.v1/network"
 )
 
-// Name is the name to refer to the Template service from another
-// package.
-const Name = "Template"
+// Used for tests
+var templateID onet.ServiceID
 
 func init() {
-	onet.RegisterNewService(Name, newService)
+	var err error
+	templateID, err = onet.RegisterNewService(template.ServiceName, newService)
+	log.ErrFatal(err)
 }
 
 // Service is our template-service
@@ -33,25 +34,25 @@ type Service struct {
 }
 
 // ClockRequest starts a template-protocol and returns the run-time.
-func (s *Service) ClockRequest(req *ClockRequest) (network.Message, onet.ClientError) {
+func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockResponse, onet.ClientError) {
 	s.Count++
-	tree := req.Roster.GenerateBinaryTree()
-	pi, err := s.CreateProtocol(template.Name, tree)
+	tree := req.Roster.GenerateNaryTreeWithRoot(2, s.ServerIdentity())
+	pi, err := s.CreateProtocol(protocol.Name, tree)
 	if err != nil {
 		return nil, onet.NewClientError(err)
 	}
 	start := time.Now()
 	pi.Start()
-	resp := &ClockResponse{
-		Children: <-pi.(*template.ProtocolTemplate).ChildCount,
+	resp := &template.ClockResponse{
+		Children: <-pi.(*protocol.Template).ChildCount,
 	}
 	resp.Time = time.Now().Sub(start).Seconds()
 	return resp, nil
 }
 
 // CountRequest returns the number of instantiations of the protocol.
-func (s *Service) CountRequest(req *CountRequest) (network.Message, onet.ClientError) {
-	return &CountResponse{s.Count}, nil
+func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, onet.ClientError) {
+	return &template.CountResponse{s.Count}, nil
 }
 
 // NewProtocol is called on all nodes of a Tree (except the root, since it is
