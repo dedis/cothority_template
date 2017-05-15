@@ -1,5 +1,5 @@
 /*
-Package template contains an example demonstrating how to write a
+Package protocol contains an example demonstrating how to write a
 protocol and a simulation.
 
 The protocol has two messages:
@@ -15,4 +15,4 @@ A simple protocol uses four files:
 - protocol_test.go tests the protocol in a local test
 - simulation.go tests the protocol on distant platforms like deterlab
 */
-package template
+package protocol

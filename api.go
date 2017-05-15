@@ -14,6 +14,9 @@ import (
 	"gopkg.in/dedis/onet.v1/network"
 )
 
+// ServiceName is used for registration on the onet.
+const ServiceName = "Template"
+
 // Client is a structure to communicate with the CoSi
 // service
 type Client struct {
@@ -22,7 +25,7 @@ type Client struct {
 
 // NewClient instantiates a new cosi.Client
 func NewClient() *Client {
-	return &Client{Client: onet.NewClient(Name)}
+	return &Client{Client: onet.NewClient(ServiceName)}
 }
 
 // Clock will return the time in seconds it took to run the protocol.

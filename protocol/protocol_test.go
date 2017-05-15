@@ -1,4 +1,4 @@
-package template_test
+package protocol_test
 
 /*
 The test-file should at the very least run the protocol for a varying number
@@ -33,7 +33,7 @@ func TestNode(t *testing.T) {
 		if err != nil {
 			t.Fatal("Couldn't start protocol:", err)
 		}
-		protocol := pi.(*template.ProtocolTemplate)
+		protocol := pi.(*protocol.Template)
 		timeout := network.WaitRetry * time.Duration(network.MaxRetryConnect*nbrNodes*2) * time.Millisecond
 		select {
 		case children := <-protocol.ChildCount:

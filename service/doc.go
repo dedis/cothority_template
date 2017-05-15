@@ -1,4 +1,4 @@
-package template
+package service
 
 /*
 A service interacts with the outer world through an API that defines the

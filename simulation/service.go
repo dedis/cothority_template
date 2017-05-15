@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/dedis/cothority_template/service"
+	"github.com/dedis/cothority_template"
 	"gopkg.in/dedis/onet.v1"
 	"gopkg.in/dedis/onet.v1/log"
 	"gopkg.in/dedis/onet.v1/simul/monitor"
@@ -62,23 +62,14 @@ func (s *SimulationService) Node(config *onet.SimulationConfig) error {
 func (s *SimulationService) Run(config *onet.SimulationConfig) error {
 	size := config.Tree.Size()
 	log.Lvl2("Size is:", size, "rounds:", s.Rounds)
-	service, ok := config.GetService(template.Name).(*template.Service)
-	if service == nil || !ok {
-		log.Fatal("Didn't find service", template.Name)
-	}
+	c := template.NewClient()
 	for round := 0; round < s.Rounds; round++ {
 		log.Lvl1("Starting round", round)
 		round := monitor.NewTimeMeasure("round")
-		ret, err := service.ClockRequest(&template.ClockRequest{Roster: config.Roster})
-		if err != nil {
-			log.Error(err)
-		}
-		resp, ok := ret.(*template.ClockResponse)
-		if !ok {
-			log.Fatal("Didn't get a ClockResponse")
-		}
+		resp, err := c.Clock(config.Roster)
+		log.ErrFatal(err)
 		if resp.Time <= 0 {
-			log.Error("0 time elapsed")
+			log.Fatal("0 time elapsed")
 		}
 		round.Record()
 	}
