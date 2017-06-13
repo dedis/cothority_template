@@ -50,7 +50,10 @@ type storage struct {
 
 // ClockRequest starts a template-protocol and returns the run-time.
 func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockResponse, onet.ClientError) {
+	s.storage.Lock()
 	s.storage.Count++
+	s.storage.Unlock()
+	s.save()
 	tree := req.Roster.GenerateNaryTreeWithRoot(2, s.ServerIdentity())
 	pi, err := s.CreateProtocol(protocol.Name, tree)
 	if err != nil {
@@ -67,6 +70,8 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 
 // CountRequest returns the number of instantiations of the protocol.
 func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, onet.ClientError) {
+	s.storage.Lock()
+	defer s.storage.Unlock()
 	return &template.CountResponse{s.storage.Count}, nil
 }
 
