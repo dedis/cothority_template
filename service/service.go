@@ -8,10 +8,14 @@ runs on the node.
 import (
 	"time"
 
+	"errors"
+	"sync"
+
 	"github.com/dedis/cothority_template"
 	"github.com/dedis/cothority_template/protocol"
 	"gopkg.in/dedis/onet.v1"
 	"gopkg.in/dedis/onet.v1/log"
+	"gopkg.in/dedis/onet.v1/network"
 )
 
 // Used for tests
@@ -21,6 +25,7 @@ func init() {
 	var err error
 	templateID, err = onet.RegisterNewService(template.ServiceName, newService)
 	log.ErrFatal(err)
+	network.RegisterMessage(&storage{})
 }
 
 // Service is our template-service
@@ -29,13 +34,26 @@ type Service struct {
 	// are correctly handled.
 	*onet.ServiceProcessor
 	path string
-	// Count holds the number of calls to 'ClockRequest'
+
+	storage *storage
+}
+
+// storageID reflects the data we're storing - we could store more
+// than one structure.
+const storageID = "main"
+
+// storage is used to save our data.
+type storage struct {
 	Count int
+	sync.Mutex
 }
 
 // ClockRequest starts a template-protocol and returns the run-time.
 func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockResponse, onet.ClientError) {
-	s.Count++
+	s.storage.Lock()
+	s.storage.Count++
+	s.storage.Unlock()
+	s.save()
 	tree := req.Roster.GenerateNaryTreeWithRoot(2, s.ServerIdentity())
 	pi, err := s.CreateProtocol(protocol.Name, tree)
 	if err != nil {
@@ -52,7 +70,9 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 
 // CountRequest returns the number of instantiations of the protocol.
 func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, onet.ClientError) {
-	return &template.CountResponse{s.Count}, nil
+	s.storage.Lock()
+	defer s.storage.Unlock()
+	return &template.CountResponse{s.storage.Count}, nil
 }
 
 // NewProtocol is called on all nodes of a Tree (except the root, since it is
@@ -67,6 +87,35 @@ func (s *Service) NewProtocol(tn *onet.TreeNodeInstance, conf *onet.GenericConfi
 	return nil, nil
 }
 
+// saves all skipblocks.
+func (s *Service) save() {
+	s.storage.Lock()
+	defer s.storage.Unlock()
+	err := s.Save(storageID, s.storage)
+	if err != nil {
+		log.Error("Couldn't save file:", err)
+	}
+}
+
+// Tries to load the configuration and updates the data in the service
+// if it finds a valid config-file.
+func (s *Service) tryLoad() error {
+	s.storage = &storage{}
+	if !s.DataAvailable(storageID) {
+		return nil
+	}
+	msg, err := s.Load(storageID)
+	if err != nil {
+		return err
+	}
+	var ok bool
+	s.storage, ok = msg.(*storage)
+	if !ok {
+		return errors.New("Data of wrong type")
+	}
+	return nil
+}
+
 // newTemplate receives the context and a path where it can write its
 // configuration, if desired. As we don't know when the service will exit,
 // we need to save the configuration on our own from time to time.
@@ -76,6 +125,9 @@ func newService(c *onet.Context) onet.Service {
 	}
 	if err := s.RegisterHandlers(s.ClockRequest, s.CountRequest); err != nil {
 		log.ErrFatal(err, "Couldn't register messages")
+	}
+	if err := s.tryLoad(); err != nil {
+		log.Error(err)
 	}
 	return s
 }
