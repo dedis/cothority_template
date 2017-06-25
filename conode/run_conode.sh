@@ -10,6 +10,7 @@ MAILCMD=/usr/bin/mail
 CONODE_BIN=conode
 DEDIS_PATH=$GOPATH/src/github.com/dedis
 COTHORITY_PATH=$DEDIS_PATH/cothority
+GOPATH=${GOPATH:-`go env GOPATH`}
 ONET_PATH=$GOPATH/src/gopkg.in/dedis/onet.v1
 CONODE_PATH=$COTHORITY_PATH/conode
 CONODE_GO=github.com/dedis/cothority/conode
@@ -31,8 +32,8 @@ main(){
 		echo "Please install go: https://golang.org/doc/install"
 		exit 1
 	fi
-	if ! echo $PATH | grep -q $GOPATH/bin; then
-		echo "Please add '$GOPATH/bin' to your '$PATH'"
+	if ! echo $PATH | grep -q "$GOPATH/bin"; then
+		echo "Please add '$GOPATH/bin' to your \$PATH."
 		PATH=$PATH:$GOPATH/bin
 	fi
 	case $( uname ) in
