@@ -72,7 +72,7 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, onet.ClientError) {
 	s.storage.Lock()
 	defer s.storage.Unlock()
-	return &template.CountResponse{s.storage.Count}, nil
+	return &template.CountResponse{Count: s.storage.Count}, nil
 }
 
 // NewProtocol is called on all nodes of a Tree (except the root, since it is

@@ -24,7 +24,9 @@ func TestService_ClockRequest(t *testing.T) {
 
 	for _, s := range services {
 		log.Lvl2("Sending request to", s)
-		resp, err := s.(*Service).ClockRequest(&template.ClockRequest{roster})
+		resp, err := s.(*Service).ClockRequest(
+			&template.ClockRequest{Roster: roster},
+		)
 		log.ErrFatal(err)
 		assert.Equal(t, resp.Children, len(roster.List))
 	}
@@ -41,7 +43,9 @@ func TestService_CountRequest(t *testing.T) {
 
 	for _, s := range services {
 		log.Lvl2("Sending request to", s)
-		resp, err := s.(*Service).ClockRequest(&template.ClockRequest{roster})
+		resp, err := s.(*Service).ClockRequest(
+			&template.ClockRequest{Roster: roster},
+		)
 		log.ErrFatal(err)
 		assert.Equal(t, resp.Children, len(roster.List))
 		count, err := s.(*Service).CountRequest(&template.CountRequest{})
