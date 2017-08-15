@@ -116,7 +116,7 @@ func (s *Service) tryLoad() error {
 	return nil
 }
 
-// newTemplate receives the context and a path where it can write its
+// newService receives the context and a path where it can write its
 // configuration, if desired. As we don't know when the service will exit,
 // we need to save the configuration on our own from time to time.
 func newService(c *onet.Context) onet.Service {
