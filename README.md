@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dedis/cothority_template.svg?branch=master)](https://travis-ci.org/dedis/cothority_template)
+
 # Template for a new cothority protocol/service/app
 
 Building on the ONet-library available at 
