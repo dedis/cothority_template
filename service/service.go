@@ -33,7 +33,6 @@ type Service struct {
 	// We need to embed the ServiceProcessor, so that incoming messages
 	// are correctly handled.
 	*onet.ServiceProcessor
-	path string
 
 	storage *storage
 }
@@ -116,9 +115,9 @@ func (s *Service) tryLoad() error {
 	return nil
 }
 
-// newService receives the context and a path where it can write its
-// configuration, if desired. As we don't know when the service will exit,
-// we need to save the configuration on our own from time to time.
+// newService receives the context that holds information about the node it's
+// running on. Saving and loading can be done using the context. The data will
+// be stored in memory for tests and simulations, and on disk for real deployments.
 func newService(c *onet.Context) onet.Service {
 	s := &Service{
 		ServiceProcessor: onet.NewServiceProcessor(c),
