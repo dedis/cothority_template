@@ -20,6 +20,7 @@ func init() {
 }
 
 const (
+	// ErrorParse indicates an error while parsing the protobuf-file.
 	ErrorParse = iota + 4000
 )
 
