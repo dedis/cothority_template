@@ -50,6 +50,26 @@ class CothorityMessages extends CothorityProtobuf {
 
         return this.decodeMessage('CountResponse', response);
     }
+
+    /**
+     * Create an encoded message to make a StatusRequest to a cothority node
+     * @returns {*|Buffer|Uint8Array}
+     */
+    createStatusRequest() {
+        return this.encodeMessage('StatusRequest', {});
+    }
+
+    /**
+     * Return the decoded response of a StatusRequest
+     * @param {*|Buffer|Uint8Array} response - Response of the Cothority
+     * @returns {*}
+     */
+    decodeStatusResponse(response) {
+        response = new Uint8Array(response);
+
+        return this.decodeMessage('StatusResponse', response);
+    }
+
     /**
      * Use the existing socket or create a new one if required
      * @param socket - WebSocket-array
