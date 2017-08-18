@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+	<meta name="generator" content="Hugo 0.18.1" />
+        <title>CothorityTemplate - starting your own cothority</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/custom.css" />
+        <link rel="stylesheet" href="css/progress.css" />
+        
+		
+        <script src="js/protobuf.min.js"></script>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/moment.min.js"></script>
+        <script src="js/sha256.min.js"></script>
+        <script src="js/topl.min.js"></script>
+        <script src="js/uuid.min.js"></script>
+        <script src="js/bundle.js"></script>
+        <noscript><link rel="stylesheet" href="css/noscript.css" /></noscript>
+        <script>
+            var addr = "localhost:7003";
+            var getting_clock = false;
+            var getting_count = false;
+
+            function getClock(){
+                if ( getting_clock ){
+                    console.log("waiting for clock");
+                    return;
+                }
+                var servers = CothorityProtobuf.toml_to_roster($('textarea#servers').val());
+                if (jQuery.isEmptyObject(servers)){
+                    alert("Please copy/paste a correct public.toml-file");
+                    return;
+                }
+
+                getting_clock = true;
+                var rm = CothorityProtobuf.createClockRequest(servers.servers);
+
+                var wsrh = new WebSocket("ws:"+addr+"/Template/ClockRequest");
+                wsrh.binaryType = 'arraybuffer';
+                setTimeout(function(){ getting_clock = false; }, 2000 );
+                wsrh.onopen = function(event){
+                    wsrh.send(rm);
+                }
+                wsrh.onmessage = function(event){
+                    var reply = CothorityProtobuf.decodeClockResponse(event.data);
+                    $("#clock_time").text(reply.Time);
+                    $("#clock_children").text(reply.Children);
+                    wsrh.close();
+                    getting_clock = false;
+                }
+                wsrh.onerror = function(event){
+                    console.log("error:" + event);
+                    getting_clock = false;
+                }
+            }
+
+            function getCount(){
+                if ( getting_count ){
+                    console.log("waiting for count");
+                    return;
+                }
+                getting_count = true;
+
+                var rm = CothorityProtobuf.createCountRequest();
+
+                var wsrh = new WebSocket("ws:"+addr+"/Template/CountRequest");
+                wsrh.binaryType = 'arraybuffer';
+                setTimeout(function(){ getting_count = false; }, 2000 );
+                wsrh.onopen = function(event){
+                    wsrh.send(rm);
+                }
+                wsrh.onmessage = function(event){
+                    var reply = CothorityProtobuf.decodeCountResponse(event.data);
+                    $("#count").text(reply.Count);
+                    wsrh.close();
+                    getting_count = false;
+                }
+                wsrh.onerror = function(event){
+                    console.log("error:" + event);
+                    getting_count = false;
+                }
+            }
+
+        </script>
+    </head>
+	<body class="is-loading">
+			<div id="wrapper">
+					<section id="main">
+						<header>
+							<h1>Cothority Template</h1>
+                            <h3>Introduction to the onet/cothority-framework</h3>
+						</header>
+						<hr />
+                        <div class="box">
+
+                            <h2>Interaction</h2>
+                            <div class="center">
+                                <div>Servers</div>
+                                <textarea id="servers" rows="10" columns="80">Copy/Paste the public.toml file here</textarea>
+                            </div>
+                            <div class="center">
+                                <div>Clock-time: <span id="clock_time"></span></div>
+                                <div>Clock-children: <span id="clock_children"></span></div>
+                            </div>
+                            <div class="center">
+                                <div>Counter: <span id="count"></span></div>
+                            </div>
+                            <br>
+                            <div class="center">
+                                <ul class="icons">
+                                    <li><a onclick="getClock();" class="fa-clock-o"></a>GetClock</li>
+                                    <li><a onclick="getCount();" class="fa-bar-chart"></a>GetCount</li>
+                                </ul>
+                            </div>
+                        </div>
+
+						<hr />
+                        <div class="box">
+                            <h2>Cothority template</h2>
+                            <p>To use this webpage, you need to run at least three conodes:</p>
+<pre><code>cd $GOPATH/src/github.com/dedis/cothority_template<br/>./conode/run_conode.sh local 3</code></pre>
+                        </div>
+						<hr />
+					</section>
+
+					<footer id="footer">
+						<ul class="copyright">
+                            <li>Created with <span class="icon fa-heart"></span> by <a href="http://dedis.epfl.ch">dedis.epfl.ch</a> </span> </li>
+                            <li>Design by <a href="http://html5up.net">HTML5 UP</a></li>
+                            <li>Image by <a href="https://unsplash.com/photos/IEHPDNk2-8w">Unsplash</a></li>
+						</ul>
+					</footer>
+			</div>
+			<script>
+				if ('addEventListener' in window) {
+					window.addEventListener('load', function() { document.body.className = document.body.className.replace(/\bis-loading\b/, ''); });
+					document.body.className += (navigator.userAgent.match(/(MSIE|rv:11\.0)/) ? ' is-ie' : '');
+				}
+			</script>
+	</body>
+</html>

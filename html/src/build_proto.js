@@ -6,13 +6,13 @@ root.define('cothority');
 
 const regex = /^.*\.proto$/;
 
-fs.readdir('src/models', (err, items) => {
+fs.readdir('models', (err, items) => {
   items.forEach(file => {
     if (regex.test(file)) {
-      root.loadSync('src/models/' + file);
+      root.loadSync('models/' + file);
     }
   });
 
-  fs.writeFileSync('src/models/skeleton.js', `export default '${JSON.stringify(root.toJSON())}';`)
+  fs.writeFileSync('models/skeleton.js', `export default '${JSON.stringify(root.toJSON())}';`)
 });
 

@@ -19,6 +19,10 @@ func init() {
 	}
 }
 
+const (
+	ErrorParse = iota + 4000
+)
+
 // ClockRequest will run the tepmlate-protocol on the roster and return
 // the time spent doing so.
 type ClockRequest struct {

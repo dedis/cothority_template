@@ -17,7 +17,7 @@ rollup.rollup({
     bundle.write({
       format: 'iife',
       moduleName: 'CothorityProtobuf',
-      dest: '../dist/bundle.js'
+      dest: '../js/bundle.js'
     });
   },
   (e) => console.log('error', e)
