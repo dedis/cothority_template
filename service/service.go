@@ -54,6 +54,9 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 	s.storage.Unlock()
 	s.save()
 	tree := req.Roster.GenerateNaryTreeWithRoot(2, s.ServerIdentity())
+	if tree == nil {
+		return nil, onet.NewClientErrorCode(template.ErrorParse, "couldn't create tree")
+	}
 	pi, err := s.CreateProtocol(protocol.Name, tree)
 	if err != nil {
 		return nil, onet.NewClientError(err)
