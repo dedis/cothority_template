@@ -7,7 +7,7 @@ DBG_APP=2
 
 main(){
     startTest
-	setupConode
+    setupConode
     test Build
     stopTest
 }
