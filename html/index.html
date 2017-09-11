@@ -24,8 +24,10 @@
     <script>
         var getting_clock = false;
         var getting_count = false;
+        var getting_status = false;
         var sockClock;
         var sockCount;
+        var sockStatus;
         var servers;
 
         function updateServers(){
@@ -86,6 +88,30 @@
             })
         }
 
+        function getStatus() {
+            if (getting_status) {
+                console.log("waiting for status");
+                return;
+            }
+            if (!updateServers()){
+                return;
+            }
+            getting_status = true;
+
+            sockStatus = CothorityProtobuf.createSocket(sockStatus,
+                CothorityProtobuf.si_to_ws(servers.servers[0], "/Status/Request"),
+            CothorityProtobuf.createStatusRequest(),
+            function(msg){
+                var reply = CothorityProtobuf.decodeStatusResponse(msg);
+                $("#status").text(reply.Status);
+                getting_status = false;
+            },
+            function(e){
+                console.log("error:" + event);
+                getting_status = false;
+            })
+        }
+
     </script>
 </head>
 <body class="is-loading">
@@ -110,11 +136,15 @@
             <div class="center">
                 <div>Counter: <span id="count"></span></div>
             </div>
+            <div class="center">
+                <div>Status: <span id="status"></span></div>
+            </div>
             <br>
             <div class="center">
                 <ul class="icons">
                     <li><a onclick="getClock();" class="fa-clock-o"></a>GetClock</li>
                     <li><a onclick="getCount();" class="fa-bar-chart"></a>GetCount</li>
+                    <li><a onclick="getStatus();" class="fa-check"></a>GetStatus</li>
                 </ul>
             </div>
         </div>
