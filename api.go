@@ -28,7 +28,7 @@ func NewClient() *Client {
 	return &Client{Client: onet.NewClient(ServiceName)}
 }
 
-// The Clock method chooses one server from the Roster at random. It
+// Clock chooses one server from the Roster at random. It
 // sends a ClockRequest to it, which is then processed on the server side
 // via the code in the service package.
 //
