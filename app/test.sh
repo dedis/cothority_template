@@ -9,25 +9,25 @@ DBG_APP=2
 main(){
     startTest
     buildConode
-	test Count
-	test Time
+    test Count
+    test Time
     stopTest
 }
 
 testCount(){
-       runCoBG 1 2
-       testFail runTmpl counter
-       testOK runTmpl counter public.toml
-       testGrep ": 0" runTmpl counter public.toml
-       runTmpl time public.toml
-       testGrep ": 1" runTmpl counter public.toml
+    runCoBG 1 2
+    testFail runTmpl counter
+    testOK runTmpl counter public.toml
+    testGrep ": 0" runTmpl counter public.toml
+    runTmpl time public.toml
+    testGrep ": 1" runTmpl counter public.toml
 }
 
 testTime(){
-       runCoBG 1 2
-       testFail runTmpl time
-       testOK runTmpl time public.toml
-       testGrep Time runTmpl time public.toml
+    runCoBG 1 2
+    testFail runTmpl time
+    testOK runTmpl time public.toml
+    testGrep Time runTmpl time public.toml
 }
 
 testBuild(){

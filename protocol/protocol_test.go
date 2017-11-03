@@ -33,7 +33,7 @@ func TestNode(t *testing.T) {
 		if err != nil {
 			t.Fatal("Couldn't start protocol:", err)
 		}
-		protocol := pi.(*protocol.Template)
+		protocol := pi.(*protocol.TemplateProtocol)
 		timeout := network.WaitRetry * time.Duration(network.MaxRetryConnect*nbrNodes*2) * time.Millisecond
 		select {
 		case children := <-protocol.ChildCount:
