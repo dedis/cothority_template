@@ -24,18 +24,21 @@ func init() {
 	onet.GlobalProtocolRegister(Name, NewProtocol)
 }
 
-// Template just holds a message that is passed to all children. It
-// also defines a channel that will receive the number of children. Only the
-// root-node will write to the channel.
-type Template struct {
+// TemplateProtocol holds the state of a given protocol.
+//
+// For this example, it defines a channel that will receive the number
+// of children. Only the root-node will write to the channel.
+type TemplateProtocol struct {
 	*onet.TreeNodeInstance
-	Message    string
 	ChildCount chan int
 }
 
+// Check that *TemplateProtocol implements onet.ProtocolInstance
+var _ onet.ProtocolInstance = (*TemplateProtocol)(nil)
+
 // NewProtocol initialises the structure for use in one round
 func NewProtocol(n *onet.TreeNodeInstance) (onet.ProtocolInstance, error) {
-	t := &Template{
+	t := &TemplateProtocol{
 		TreeNodeInstance: n,
 		ChildCount:       make(chan int),
 	}
@@ -48,16 +51,16 @@ func NewProtocol(n *onet.TreeNodeInstance) (onet.ProtocolInstance, error) {
 }
 
 // Start sends the Announce-message to all children
-func (p *Template) Start() error {
-	log.Lvl3("Starting Template")
+func (p *TemplateProtocol) Start() error {
+	log.Lvl3("Starting TemplateProtocol")
 	return p.HandleAnnounce(StructAnnounce{p.TreeNode(),
 		Announce{"cothority rulez!"}})
 }
 
 // HandleAnnounce is the first message and is used to send an ID that
 // is stored in all nodes.
-func (p *Template) HandleAnnounce(msg StructAnnounce) error {
-	p.Message = msg.Message
+func (p *TemplateProtocol) HandleAnnounce(msg StructAnnounce) error {
+	log.Lvl3("Parent announces:", msg.Message)
 	if !p.IsLeaf() {
 		// If we have children, send the same message to all of them
 		p.SendToChildren(&msg.Announce)
@@ -70,7 +73,7 @@ func (p *Template) HandleAnnounce(msg StructAnnounce) error {
 
 // HandleReply is the message going up the tree and holding a counter
 // to verify the number of nodes.
-func (p *Template) HandleReply(reply []StructReply) error {
+func (p *TemplateProtocol) HandleReply(reply []StructReply) error {
 	defer p.Done()
 
 	children := 1

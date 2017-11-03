@@ -64,7 +64,7 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 	start := time.Now()
 	pi.Start()
 	resp := &template.ClockResponse{
-		Children: <-pi.(*protocol.Template).ChildCount,
+		Children: <-pi.(*protocol.TemplateProtocol).ChildCount,
 	}
 	resp.Time = time.Now().Sub(start).Seconds()
 	return resp, nil
