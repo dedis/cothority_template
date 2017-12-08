@@ -13,9 +13,9 @@ import (
 
 	"github.com/dedis/cothority_template"
 	"github.com/dedis/cothority_template/protocol"
-	"gopkg.in/dedis/onet.v1"
-	"gopkg.in/dedis/onet.v1/log"
-	"gopkg.in/dedis/onet.v1/network"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
 )
 
 // Used for tests
@@ -121,7 +121,7 @@ func (s *Service) tryLoad() error {
 // newService receives the context that holds information about the node it's
 // running on. Saving and loading can be done using the context. The data will
 // be stored in memory for tests and simulations, and on disk for real deployments.
-func newService(c *onet.Context) onet.Service {
+func newService(c *onet.Context) (onet.Service, error) {
 	s := &Service{
 		ServiceProcessor: onet.NewServiceProcessor(c),
 	}
@@ -130,6 +130,7 @@ func newService(c *onet.Context) onet.Service {
 	}
 	if err := s.tryLoad(); err != nil {
 		log.Error(err)
+		return nil, err
 	}
-	return s
+	return s, nil
 }

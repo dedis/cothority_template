@@ -4,17 +4,20 @@ import (
 	"testing"
 
 	"github.com/dedis/cothority_template"
+	"github.com/dedis/kyber/suites"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/dedis/onet.v1"
-	"gopkg.in/dedis/onet.v1/log"
 )
+
+var tSuite = suites.MustFind("Ed25519")
 
 func TestMain(m *testing.M) {
 	log.MainTest(m)
 }
 
 func TestService_ClockRequest(t *testing.T) {
-	local := onet.NewTCPTest()
+	local := onet.NewTCPTest(tSuite)
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
 	hosts, roster, _ := local.GenTree(5, true)
@@ -33,7 +36,7 @@ func TestService_ClockRequest(t *testing.T) {
 }
 
 func TestService_CountRequest(t *testing.T) {
-	local := onet.NewTCPTest()
+	local := onet.NewTCPTest(tSuite)
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
 	hosts, roster, _ := local.GenTree(5, true)

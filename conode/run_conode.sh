@@ -5,13 +5,19 @@ set -e
 # run_conode.sh public # Launch a public conode - supposes it's already configured
 # run_conode.sh local 3 # Launches 3 conodes locally.
 
+GOPATH=${GOPATH:-`go env GOPATH 2>/dev/null || true`}
+if [ ! "$GOPATH" ]; then
+    echo '$GOPATH not found'
+    echo "Please install go: https://golang.org/doc/install"
+    exit 1
+fi
+	
 MAILADDR=linus.gasser@epfl.ch
 MAILCMD=/usr/bin/mail
 CONODE_BIN=conode
 DEDIS_PATH=$GOPATH/src/github.com/dedis
 COTHORITY_PATH=$DEDIS_PATH/cothority_template
-GOPATH=${GOPATH:-`go env GOPATH`}
-ONET_PATH=$GOPATH/src/gopkg.in/dedis/onet.v1
+ONET_PATH=$GOPATH/src/github.com/dedis/onet
 CONODE_PATH=$COTHORITY_PATH/conode
 CONODE_GO=github.com/dedis/cothority_template/conode
 VERSION_SUB="1"
@@ -25,11 +31,6 @@ MEMLIMIT=""
 main(){
 	if [ ! "$1" ]; then
 		showHelp
-		exit 1
-	fi
-	if [ ! "$GOPATH" ]; then
-		echo "'$GOPATH' not found"
-		echo "Please install go: https://golang.org/doc/install"
 		exit 1
 	fi
 	if ! echo $PATH | grep -q "$GOPATH/bin"; then
@@ -292,7 +293,7 @@ EOF
 }
 
 test(){
-	. $GOPATH/src/gopkg.in/dedis/onet.v1/app/libtest.sh
+	. $GOPATH/src/github.com/dedis/onet/app/libtest.sh
 
 	if [ "$1" != "-update_rec" ]; then
 		testUpdate

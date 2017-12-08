@@ -3,6 +3,7 @@ Servers = 8
 Bf = 4
 Rounds = 10
 CloseWait = 6000
+Suite = "Ed25519"
 
 Depth
 1

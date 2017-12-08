@@ -5,8 +5,8 @@ This holds the messages used to communicate with the service over the network.
 */
 
 import (
-	"gopkg.in/dedis/onet.v1"
-	"gopkg.in/dedis/onet.v1/network"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/network"
 )
 
 // We need to register all messages so the network knows how to handle them.

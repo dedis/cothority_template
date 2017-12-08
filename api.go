@@ -9,9 +9,10 @@ This part of the service runs on the client or the app.
 */
 
 import (
-	"gopkg.in/dedis/onet.v1"
-	"gopkg.in/dedis/onet.v1/log"
-	"gopkg.in/dedis/onet.v1/network"
+	"github.com/dedis/cothority"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
 )
 
 // ServiceName is used for registration on the onet.
@@ -25,7 +26,7 @@ type Client struct {
 
 // NewClient instantiates a new cosi.Client
 func NewClient() *Client {
-	return &Client{Client: onet.NewClient(ServiceName)}
+	return &Client{Client: onet.NewClient(ServiceName, cothority.Suite)}
 }
 
 // Clock chooses one server from the Roster at random. It

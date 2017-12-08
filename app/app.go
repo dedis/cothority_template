@@ -7,11 +7,12 @@ package main
 import (
 	"os"
 
+	"github.com/dedis/cothority"
 	template "github.com/dedis/cothority_template"
 
-	"gopkg.in/dedis/onet.v1/app"
+	"github.com/dedis/onet/app"
 
-	"gopkg.in/dedis/onet.v1/log"
+	"github.com/dedis/onet/log"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -80,7 +81,7 @@ func readGroup(c *cli.Context) *app.Group {
 	name := c.Args().First()
 	f, err := os.Open(name)
 	log.ErrFatal(err, "Couldn't open group definition file")
-	group, err := app.ReadGroupDescToml(f)
+	group, err := app.ReadGroupDescToml(f, cothority.Suite)
 	log.ErrFatal(err, "Error while reading group definition file", err)
 	if len(group.Roster.List) == 0 {
 		log.ErrFatalf(err, "Empty entity or invalid group defintion in: %s",
