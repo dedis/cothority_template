@@ -13,12 +13,15 @@
 package main
 
 import (
-	// Here you can import any other needed service for your conode.
 	"github.com/dedis/cothority"
-	_ "github.com/dedis/cothority/cosi/service"
-	_ "github.com/dedis/cothority/status/service"
-	_ "github.com/dedis/cothority_template/service"
 	"github.com/dedis/onet/app"
+
+	// Import your service:
+	_ "github.com/dedis/cothority_template/service"
+	// Here you can import any other needed service for your conode.
+	// For example, if your service needs cosi available in the server
+	// as well, uncomment this:
+	//_ "github.com/dedis/cothority/cosi/service"
 )
 
 func main() {

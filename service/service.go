@@ -103,12 +103,12 @@ func (s *Service) save() {
 // if it finds a valid config-file.
 func (s *Service) tryLoad() error {
 	s.storage = &storage{}
-	if !s.DataAvailable(storageID) {
-		return nil
-	}
 	msg, err := s.Load(storageID)
 	if err != nil {
 		return err
+	}
+	if msg == nil {
+		return nil
 	}
 	var ok bool
 	s.storage, ok = msg.(*storage)
