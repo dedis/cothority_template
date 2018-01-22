@@ -11,10 +11,13 @@ import (
 	"time"
 
 	"github.com/dedis/cothority_template/protocol"
-	"gopkg.in/dedis/onet.v1"
-	"gopkg.in/dedis/onet.v1/log"
-	"gopkg.in/dedis/onet.v1/network"
+	"github.com/dedis/kyber/suites"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/network"
 )
+
+var tSuite = suites.MustFind("Ed25519")
 
 func TestMain(m *testing.M) {
 	log.MainTest(m)
@@ -23,7 +26,7 @@ func TestMain(m *testing.M) {
 // Tests a 2, 5 and 13-node system. It is good practice to test different
 // sizes of trees to make sure your protocol is stable.
 func TestNode(t *testing.T) {
-	local := onet.NewLocalTest()
+	local := onet.NewLocalTest(tSuite)
 	nodes := []int{2, 5, 13}
 	for _, nbrNodes := range nodes {
 		_, _, tree := local.GenTree(nbrNodes, true)

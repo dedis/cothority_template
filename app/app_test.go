@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"gopkg.in/dedis/onet.v1/log"
+	"github.com/dedis/onet/log"
 )
 
 // You may put normal Go tests in this file. For more information

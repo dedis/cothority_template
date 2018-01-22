@@ -7,7 +7,7 @@ with the `*onet.TreeNode` embedded. The latter is used in the handler-function
 so that it can find out who sent the message.
 */
 
-import "gopkg.in/dedis/onet.v1"
+import "github.com/dedis/onet"
 
 // Name can be used from other packages to refer to this protocol.
 const Name = "Template"

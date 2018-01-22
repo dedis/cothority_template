@@ -23,13 +23,13 @@ account at `yourlogin`.
 
 ```bash
 go get -u github.com/dedis/cothority_template
-cd $GOPATH/src/github.com/dedis/cothority_template
+cd $(go env GOPATH)/src/github.com/dedis/cothority_template
 git remote add perso git@github.com/yourlogin/template
 git checkout -b my_new_project
 git push -u perso my_new_project
 ```
 
-Now you can do all your development in `$GOPATH/src/github.com/dedis/cothority_template`
+Now you can do all your development in `$(go env GOPATH)/src/github.com/dedis/cothority_template`
 until you are proficient enough to move it either to the main-repository at
 `dedis/cothority` or adjusting the paths and publish it under your own repo.
 

@@ -25,9 +25,9 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/dedis/cothority_template/protocol"
-	"gopkg.in/dedis/onet.v1"
-	"gopkg.in/dedis/onet.v1/log"
-	"gopkg.in/dedis/onet.v1/simul/monitor"
+	"github.com/dedis/onet"
+	"github.com/dedis/onet/log"
+	"github.com/dedis/onet/simul/monitor"
 )
 
 func init() {

@@ -13,13 +13,72 @@
 package main
 
 import (
-	// Here you can import any other needed service for your conode.
-	_ "github.com/dedis/cothority/cosi/service"
-	_ "github.com/dedis/cothority/status/service"
+	"os"
+
+	"github.com/dedis/cothority"
+	"github.com/dedis/onet/app"
+	"github.com/dedis/onet/log"
+	cli "gopkg.in/urfave/cli.v1"
+
+	// Import your service:
 	_ "github.com/dedis/cothority_template/service"
-	"gopkg.in/dedis/onet.v1/app"
+	// Here you can import any other needed service for your conode.
+	// For example, if your service needs cosi available in the server
+	// as well, uncomment this:
+	//_ "github.com/dedis/cothority/cosi/service"
 )
 
 func main() {
-	app.Server()
+	cliApp := cli.NewApp()
+	cliApp.Name = "cothority_template"
+	cliApp.Usage = "basic file for an app"
+	cliApp.Version = "0.1"
+
+	cliApp.Commands = []cli.Command{
+		{
+			Name:    "setup",
+			Aliases: []string{"s"},
+			Usage:   "Setup server configuration (interactive)",
+			Action: func(c *cli.Context) error {
+				if c.String("config") != "" {
+					log.Fatal("[-] Configuration file option cannot be used for the 'setup' command")
+				}
+				if c.String("debug") != "" {
+					log.Fatal("[-] Debug option cannot be used for the 'setup' command")
+				}
+				app.InteractiveConfig("cothority_template")
+				return nil
+			},
+		},
+		{
+			Name:  "server",
+			Usage: "Start cothority server",
+			Action: func(c *cli.Context) {
+				runServer(c)
+			},
+		},
+	}
+	cliApp.Flags = []cli.Flag{
+		cli.IntFlag{
+			Name:  "debug, d",
+			Value: 0,
+			Usage: "debug-level: 1 for terse, 5 for maximal",
+		},
+		cli.StringFlag{
+			Name:  "config, c",
+			Value: app.GetDefaultConfigFile("cothority_template"),
+			Usage: "Configuration file of the server",
+		},
+	}
+	cliApp.Before = func(c *cli.Context) error {
+		log.SetDebugVisible(c.Int("debug"))
+		return nil
+	}
+
+	log.ErrFatal(cliApp.Run(os.Args))
+}
+
+func runServer(c *cli.Context) error {
+	app.RunServer(c.GlobalString("config"), cothority.Suite)
+	return nil
 }
