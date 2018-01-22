@@ -39,7 +39,11 @@ func main() {
 		},
 	}
 	cliApp.Flags = []cli.Flag{
-		app.FlagDebug,
+		cli.IntFlag{
+			Name:  "debug, d",
+			Value: 0,
+			Usage: "debug-level: 1 for terse, 5 for maximal",
+		},
 	}
 	cliApp.Before = func(c *cli.Context) error {
 		log.SetDebugVisible(c.Int("debug"))
