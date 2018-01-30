@@ -46,7 +46,7 @@ func main() {
 				if c.String("debug") != "" {
 					log.Fatal("[-] Debug option cannot be used for the 'setup' command")
 				}
-				app.InteractiveConfig("cothority_template")
+				app.InteractiveConfig("cothority_template", cothority.Suite)
 				return nil
 			},
 		},
@@ -79,6 +79,6 @@ func main() {
 }
 
 func runServer(c *cli.Context) error {
-	app.RunServer(c.GlobalString("config"), cothority.Suite)
+	app.RunServer(c.GlobalString("config"))
 	return nil
 }

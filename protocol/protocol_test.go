@@ -26,9 +26,9 @@ func TestMain(m *testing.M) {
 // Tests a 2, 5 and 13-node system. It is good practice to test different
 // sizes of trees to make sure your protocol is stable.
 func TestNode(t *testing.T) {
-	local := onet.NewLocalTest(tSuite)
 	nodes := []int{2, 5, 13}
 	for _, nbrNodes := range nodes {
+		local := onet.NewLocalTest(tSuite)
 		_, _, tree := local.GenTree(nbrNodes, true)
 		log.Lvl3(tree.Dump())
 
