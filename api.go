@@ -34,7 +34,7 @@ func NewClient() *Client {
 // via the code in the service package.
 //
 // Clock will return the time in seconds it took to run the protocol.
-func (c *Client) Clock(r *onet.Roster) (*ClockResponse, onet.ClientError) {
+func (c *Client) Clock(r *onet.Roster) (*ClockResponse, error) {
 	dst := r.RandomServerIdentity()
 	log.Lvl4("Sending message to", dst)
 	reply := &ClockResponse{}

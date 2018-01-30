@@ -48,18 +48,18 @@ type storage struct {
 }
 
 // ClockRequest starts a template-protocol and returns the run-time.
-func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockResponse, onet.ClientError) {
+func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockResponse, error) {
 	s.storage.Lock()
 	s.storage.Count++
 	s.storage.Unlock()
 	s.save()
 	tree := req.Roster.GenerateNaryTreeWithRoot(2, s.ServerIdentity())
 	if tree == nil {
-		return nil, onet.NewClientErrorCode(template.ErrorParse, "couldn't create tree")
+		return nil, errors.New("couldn't create tree")
 	}
 	pi, err := s.CreateProtocol(protocol.Name, tree)
 	if err != nil {
-		return nil, onet.NewClientError(err)
+		return nil, err
 	}
 	start := time.Now()
 	pi.Start()
@@ -71,7 +71,7 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 }
 
 // CountRequest returns the number of instantiations of the protocol.
-func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, onet.ClientError) {
+func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, error) {
 	s.storage.Lock()
 	defer s.storage.Unlock()
 	return &template.CountResponse{Count: s.storage.Count}, nil
