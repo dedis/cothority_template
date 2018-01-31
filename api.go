@@ -18,13 +18,13 @@ import (
 // ServiceName is used for registration on the onet.
 const ServiceName = "Template"
 
-// Client is a structure to communicate with the CoSi
+// Client is a structure to communicate with the template
 // service
 type Client struct {
 	*onet.Client
 }
 
-// NewClient instantiates a new cosi.Client
+// NewClient instantiates a new template.Client
 func NewClient() *Client {
 	return &Client{Client: onet.NewClient(ServiceName, cothority.Suite)}
 }
