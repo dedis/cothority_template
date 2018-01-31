@@ -11,12 +11,10 @@ import (
 
 // We need to register all messages so the network knows how to handle them.
 func init() {
-	for _, msg := range []interface{}{
+	network.RegisterMessages(
 		CountRequest{}, CountResponse{},
 		ClockRequest{}, ClockResponse{},
-	} {
-		network.RegisterMessage(msg)
-	}
+	)
 }
 
 const (
