@@ -89,7 +89,7 @@ func (s *Service) NewProtocol(tn *onet.TreeNodeInstance, conf *onet.GenericConfi
 	return nil, nil
 }
 
-// saves all skipblocks.
+// saves all data.
 func (s *Service) save() {
 	s.storage.Lock()
 	defer s.storage.Unlock()
