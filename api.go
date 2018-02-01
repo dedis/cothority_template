@@ -26,7 +26,7 @@ type Client struct {
 
 // NewClient instantiates a new template.Client
 func NewClient() *Client {
-	return &Client{Client: onet.NewClient(ServiceName, cothority.Suite)}
+	return &Client{Client: onet.NewClient(cothority.Suite, ServiceName)}
 }
 
 // Clock chooses one server from the Roster at random. It
