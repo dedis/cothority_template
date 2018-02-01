@@ -46,7 +46,7 @@ func main() {
 				if c.String("debug") != "" {
 					log.Fatal("[-] Debug option cannot be used for the 'setup' command")
 				}
-				app.InteractiveConfig("cothority_template", cothority.Suite)
+				app.InteractiveConfig(cothority.Suite, "cothority_template")
 				return nil
 			},
 		},
