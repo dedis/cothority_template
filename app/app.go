@@ -5,6 +5,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 
 	template "github.com/dedis/cothority_template"
@@ -48,7 +49,7 @@ func main() {
 		log.SetDebugVisible(c.Int("debug"))
 		return nil
 	}
-	cliApp.Run(os.Args)
+	log.ErrFatal(cliApp.Run(os.Args))
 }
 
 // Returns the time needed to contact all nodes.
@@ -58,7 +59,7 @@ func cmdTime(c *cli.Context) error {
 	client := template.NewClient()
 	resp, err := client.Clock(group.Roster)
 	if err != nil {
-		log.Fatal("When asking the time:", err)
+		return errors.New("When asking the time: " + err.Error())
 	}
 	log.Infof("Children: %d - Time spent: %f", resp.Children, resp.Time)
 	return nil
@@ -71,7 +72,7 @@ func cmdCounter(c *cli.Context) error {
 	client := template.NewClient()
 	counter, err := client.Count(group.Roster.RandomServerIdentity())
 	if err != nil {
-		log.Fatal("When asking for counter:", err)
+		return errors.New("When asking for counter: " + err.Error())
 	}
 	log.Info("Number of requests:", counter)
 	return nil
