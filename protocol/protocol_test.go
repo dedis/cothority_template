@@ -15,6 +15,7 @@ import (
 	"github.com/dedis/onet"
 	"github.com/dedis/onet/log"
 	"github.com/dedis/onet/network"
+	"github.com/stretchr/testify/require"
 )
 
 var tSuite = suites.MustFind("Ed25519")
@@ -33,17 +34,13 @@ func TestNode(t *testing.T) {
 		log.Lvl3(tree.Dump())
 
 		pi, err := local.StartProtocol("Template", tree)
-		if err != nil {
-			t.Fatal("Couldn't start protocol:", err)
-		}
+		require.Nil(t, err)
 		protocol := pi.(*protocol.TemplateProtocol)
 		timeout := network.WaitRetry * time.Duration(network.MaxRetryConnect*nbrNodes*2) * time.Millisecond
 		select {
 		case children := <-protocol.ChildCount:
 			log.Lvl2("Instance 1 is done")
-			if children != nbrNodes {
-				t.Fatal("Didn't get a child-cound of", nbrNodes)
-			}
+			require.Equal(t, children, nbrNodes, "Didn't get a child-cound of", nbrNodes)
 		case <-time.After(timeout):
 			t.Fatal("Didn't finish in time")
 		}

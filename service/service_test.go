@@ -7,7 +7,7 @@ import (
 	"github.com/dedis/kyber/suites"
 	"github.com/dedis/onet"
 	"github.com/dedis/onet/log"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var tSuite = suites.MustFind("Ed25519")
@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 	log.MainTest(m)
 }
 
-func TestService_ClockRequest(t *testing.T) {
+func TestService_Clock(t *testing.T) {
 	local := onet.NewTCPTest(tSuite)
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
@@ -27,15 +27,15 @@ func TestService_ClockRequest(t *testing.T) {
 
 	for _, s := range services {
 		log.Lvl2("Sending request to", s)
-		resp, err := s.(*Service).ClockRequest(
-			&template.ClockRequest{Roster: roster},
+		resp, err := s.(*Service).Clock(
+			&template.Clock{Roster: roster},
 		)
-		log.ErrFatal(err)
-		assert.Equal(t, resp.Children, len(roster.List))
+		require.Nil(t, err)
+		require.Equal(t, resp.Children, len(roster.List))
 	}
 }
 
-func TestService_CountRequest(t *testing.T) {
+func TestService_Count(t *testing.T) {
 	local := onet.NewTCPTest(tSuite)
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
@@ -46,13 +46,13 @@ func TestService_CountRequest(t *testing.T) {
 
 	for _, s := range services {
 		log.Lvl2("Sending request to", s)
-		resp, err := s.(*Service).ClockRequest(
-			&template.ClockRequest{Roster: roster},
+		resp, err := s.(*Service).Clock(
+			&template.Clock{Roster: roster},
 		)
-		log.ErrFatal(err)
-		assert.Equal(t, resp.Children, len(roster.List))
-		count, err := s.(*Service).CountRequest(&template.CountRequest{})
-		log.ErrFatal(err)
-		assert.Equal(t, 1, count.Count)
+		require.Nil(t, err)
+		require.Equal(t, resp.Children, len(roster.List))
+		count, err := s.(*Service).Count(&template.Count{})
+		require.Nil(t, err)
+		require.Equal(t, 1, count.Count)
 	}
 }
