@@ -47,8 +47,8 @@ type storage struct {
 	sync.Mutex
 }
 
-// ClockRequest starts a template-protocol and returns the run-time.
-func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockResponse, error) {
+// Clock starts a template-protocol and returns the run-time.
+func (s *Service) Clock(req *template.Clock) (*template.ClockReply, error) {
 	s.storage.Lock()
 	s.storage.Count++
 	s.storage.Unlock()
@@ -63,18 +63,18 @@ func (s *Service) ClockRequest(req *template.ClockRequest) (*template.ClockRespo
 	}
 	start := time.Now()
 	pi.Start()
-	resp := &template.ClockResponse{
+	resp := &template.ClockReply{
 		Children: <-pi.(*protocol.TemplateProtocol).ChildCount,
 	}
 	resp.Time = time.Now().Sub(start).Seconds()
 	return resp, nil
 }
 
-// CountRequest returns the number of instantiations of the protocol.
-func (s *Service) CountRequest(req *template.CountRequest) (*template.CountResponse, error) {
+// Count returns the number of instantiations of the protocol.
+func (s *Service) Count(req *template.Count) (*template.CountReply, error) {
 	s.storage.Lock()
 	defer s.storage.Unlock()
-	return &template.CountResponse{Count: s.storage.Count}, nil
+	return &template.CountReply{Count: s.storage.Count}, nil
 }
 
 // NewProtocol is called on all nodes of a Tree (except the root, since it is
@@ -95,7 +95,7 @@ func (s *Service) save() {
 	defer s.storage.Unlock()
 	err := s.Save(storageID, s.storage)
 	if err != nil {
-		log.Error("Couldn't save file:", err)
+		log.Error("Couldn't save data:", err)
 	}
 }
 
@@ -125,8 +125,8 @@ func newService(c *onet.Context) (onet.Service, error) {
 	s := &Service{
 		ServiceProcessor: onet.NewServiceProcessor(c),
 	}
-	if err := s.RegisterHandlers(s.ClockRequest, s.CountRequest); err != nil {
-		log.ErrFatal(err, "Couldn't register messages")
+	if err := s.RegisterHandlers(s.Clock, s.Count); err != nil {
+		return nil, errors.New("Couldn't register messages")
 	}
 	if err := s.tryLoad(); err != nil {
 		log.Error(err)

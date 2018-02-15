@@ -3,7 +3,7 @@ package template_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	// We need to include the service so it is started.
 	"github.com/dedis/cothority_template"
@@ -29,11 +29,11 @@ func TestClient_Clock(t *testing.T) {
 
 	c := template.NewClient()
 	cl1, err := c.Clock(roster)
-	log.ErrFatal(err)
-	assert.Equal(t, nbr, cl1.Children)
+	require.Nil(t, err)
+	require.Equal(t, nbr, cl1.Children)
 	cl2, err := c.Clock(roster)
-	log.ErrFatal(err)
-	assert.Equal(t, nbr, cl2.Children)
+	require.Nil(t, err)
+	require.Equal(t, nbr, cl2.Children)
 }
 
 func TestClient_Count(t *testing.T) {
@@ -48,22 +48,22 @@ func TestClient_Count(t *testing.T) {
 	// Verify it's all 0s before
 	for _, s := range roster.List {
 		count, err := c.Count(s)
-		log.ErrFatal(err)
-		assert.Equal(t, 0, count)
+		require.Nil(t, err)
+		require.Equal(t, 0, count)
 	}
 
 	// Make some clock-requests
 	for range roster.List {
 		_, err := c.Clock(roster)
-		log.ErrFatal(err)
+		require.Nil(t, err)
 	}
 
 	// Verify we have the correct total of requests
 	total := 0
 	for _, s := range roster.List {
 		count, err := c.Count(s)
-		log.ErrFatal(err)
+		require.Nil(t, err)
 		total += count
 	}
-	assert.Equal(t, nbr, total)
+	require.Equal(t, nbr, total)
 }

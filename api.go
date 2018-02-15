@@ -30,15 +30,15 @@ func NewClient() *Client {
 }
 
 // Clock chooses one server from the Roster at random. It
-// sends a ClockRequest to it, which is then processed on the server side
+// sends a Clock to it, which is then processed on the server side
 // via the code in the service package.
 //
 // Clock will return the time in seconds it took to run the protocol.
-func (c *Client) Clock(r *onet.Roster) (*ClockResponse, error) {
+func (c *Client) Clock(r *onet.Roster) (*ClockReply, error) {
 	dst := r.RandomServerIdentity()
 	log.Lvl4("Sending message to", dst)
-	reply := &ClockResponse{}
-	err := c.SendProtobuf(dst, &ClockRequest{r}, reply)
+	reply := &ClockReply{}
+	err := c.SendProtobuf(dst, &Clock{r}, reply)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +48,8 @@ func (c *Client) Clock(r *onet.Roster) (*ClockResponse, error) {
 // Count will return the number of times `Clock` has been called on this
 // service-node.
 func (c *Client) Count(si *network.ServerIdentity) (int, error) {
-	reply := &CountResponse{}
-	err := c.SendProtobuf(si, &CountRequest{}, reply)
+	reply := &CountReply{}
+	err := c.SendProtobuf(si, &Count{}, reply)
 	if err != nil {
 		return -1, err
 	}

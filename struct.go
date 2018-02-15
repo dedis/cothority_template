@@ -12,8 +12,8 @@ import (
 // We need to register all messages so the network knows how to handle them.
 func init() {
 	network.RegisterMessages(
-		CountRequest{}, CountResponse{},
-		ClockRequest{}, ClockResponse{},
+		Count{}, CountReply{},
+		Clock{}, ClockReply{},
 	)
 }
 
@@ -22,23 +22,23 @@ const (
 	ErrorParse = iota + 4000
 )
 
-// ClockRequest will run the tepmlate-protocol on the roster and return
+// Clock will run the tepmlate-protocol on the roster and return
 // the time spent doing so.
-type ClockRequest struct {
+type Clock struct {
 	Roster *onet.Roster
 }
 
-// ClockResponse returns the time spent for the protocol-run.
-type ClockResponse struct {
+// ClockReply returns the time spent for the protocol-run.
+type ClockReply struct {
 	Time     float64
 	Children int
 }
 
-// CountRequest will return how many times the protocol has been run.
-type CountRequest struct {
+// Count will return how many times the protocol has been run.
+type Count struct {
 }
 
-// CountResponse returns the number of protocol-runs
-type CountResponse struct {
+// CountReply returns the number of protocol-runs
+type CountReply struct {
 	Count int
 }
