@@ -39,7 +39,7 @@ type Service struct {
 
 // storageID reflects the data we're storing - we could store more
 // than one structure.
-const storageID = "main"
+var storageID = []byte("main")
 
 // storage is used to save our data.
 type storage struct {
