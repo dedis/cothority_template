@@ -1,1 +1,7 @@
 *.iml
+.tags*
+build/
+conode/conode
+simulation/simulation
+simulation/server_list
+simulation/deter.toml
