@@ -3,7 +3,7 @@
 Navigation: [DEDIS](https://github.com/dedis/doc/tree/master/README.md) ::
 Cothority Template
 
-# Introduction
+# Template for a new cothority protocol/service/app
 
 The following paragraphs give a short introduction in the onet framework and
 should be your starting point if this is a new project for you.
@@ -65,7 +65,6 @@ repository in your account and then copy over the necessary files. Then you
 will need to replace all the `github.com/dedis/cothority_tempate` references
 with the path of your repository, e.g. `github.com/foo/super_protocol` if your
 account is `foo` and the repository is `super_protocol`.
-
 If you happen to do a semester project for DEDIS, please ask your responsible to
 set up a `github.com/dedis/student_yy_name` repository for you.
 

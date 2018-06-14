@@ -1,0 +1,12 @@
+Servers = 16
+Simulation = "TemplateProtocol"
+BF = 2
+Rounds = 4
+Suite = "bn256.g2"
+Tags = "vartime"
+
+Hosts
+3
+7
+15
+31
