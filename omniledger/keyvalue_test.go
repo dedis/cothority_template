@@ -44,7 +44,7 @@ func TestKeyValue_Spawn(t *testing.T) {
 	values, err := pr.InclusionProof.RawValues()
 	require.Nil(t, err)
 	// And decode the buffer to a ContractStruct.
-	cs := ContractStruct{}
+	cs := KeyValueData{}
 	err = protobuf.Decode(values[0], &cs)
 	require.Nil(t, err)
 	// Verify all values are in there.
@@ -115,7 +115,7 @@ func TestKeyValue_Invoke(t *testing.T) {
 	require.NotEqual(t, 10, i, "didn't include new values in time")
 
 	// Read the content of the instance back into a structure.
-	var newArgs ContractStruct
+	var newArgs KeyValueData
 	err = protobuf.Decode(values2[0], &newArgs)
 	require.Nil(t, err)
 	// Verify the content is as it is supposed to be.
@@ -127,7 +127,7 @@ func TestKeyValue_Invoke(t *testing.T) {
 }
 
 func TestContractStruct_Update(t *testing.T) {
-	cs := ContractStruct{
+	cs := KeyValueData{
 		Storage: []KeyValue{{
 			Key:   "one",
 			Value: []byte{1},
@@ -200,13 +200,6 @@ func newOLTest(t *testing.T) (olt *olTest) {
 }
 
 func (olt *olTest) Close() {
-	// Because OmniLedger uses go-routines to create new blocks, we need to tell
-	// it to stop doing so.
-	services := olt.local.GetServices(olt.servers, service.OmniledgerID)
-	for _, s := range services {
-		s.(*service.Service).ClosePolling()
-	}
-
 	olt.local.CloseAll()
 }
 

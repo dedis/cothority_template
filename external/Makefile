@@ -6,4 +6,3 @@ do-java:
 		echo $$i ; \
 		protoc -I=proto --java_out=java/src/main/java $$i ; \
 	done
-

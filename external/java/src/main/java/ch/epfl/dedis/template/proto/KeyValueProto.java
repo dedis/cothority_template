@@ -685,8 +685,8 @@ public final class KeyValueProto {
 
   }
 
-  public interface ContractStructOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:keyvalue.ContractStruct)
+  public interface KeyValueDataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:keyvalue.KeyValueData)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -715,21 +715,21 @@ public final class KeyValueProto {
   }
   /**
    * <pre>
-   * ContractStruct is the structure that will hold all key/value pairs.
+   * KeyValueData is the structure that will hold all key/value pairs.
    * </pre>
    *
-   * Protobuf type {@code keyvalue.ContractStruct}
+   * Protobuf type {@code keyvalue.KeyValueData}
    */
-  public  static final class ContractStruct extends
+  public  static final class KeyValueData extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:keyvalue.ContractStruct)
-      ContractStructOrBuilder {
+      // @@protoc_insertion_point(message_implements:keyvalue.KeyValueData)
+      KeyValueDataOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use ContractStruct.newBuilder() to construct.
-    private ContractStruct(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use KeyValueData.newBuilder() to construct.
+    private KeyValueData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private ContractStruct() {
+    private KeyValueData() {
       storage_ = java.util.Collections.emptyList();
     }
 
@@ -738,7 +738,7 @@ public final class KeyValueProto {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private ContractStruct(
+    private KeyValueData(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -787,14 +787,14 @@ public final class KeyValueProto {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_ContractStruct_descriptor;
+      return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_KeyValueData_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_ContractStruct_fieldAccessorTable
+      return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_KeyValueData_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.class, ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.Builder.class);
+              ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.class, ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.Builder.class);
     }
 
     public static final int STORAGE_FIELD_NUMBER = 1;
@@ -875,10 +875,10 @@ public final class KeyValueProto {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct)) {
+      if (!(obj instanceof ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData)) {
         return super.equals(obj);
       }
-      ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct other = (ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct) obj;
+      ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData other = (ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData) obj;
 
       boolean result = true;
       result = result && getStorageList()
@@ -903,69 +903,69 @@ public final class KeyValueProto {
       return hash;
     }
 
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(byte[] data)
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(java.io.InputStream input)
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseDelimitedFrom(java.io.InputStream input)
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseDelimitedFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parseFrom(
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -977,7 +977,7 @@ public final class KeyValueProto {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct prototype) {
+    public static Builder newBuilder(ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
@@ -993,28 +993,28 @@ public final class KeyValueProto {
     }
     /**
      * <pre>
-     * ContractStruct is the structure that will hold all key/value pairs.
+     * KeyValueData is the structure that will hold all key/value pairs.
      * </pre>
      *
-     * Protobuf type {@code keyvalue.ContractStruct}
+     * Protobuf type {@code keyvalue.KeyValueData}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:keyvalue.ContractStruct)
-        ch.epfl.dedis.template.proto.KeyValueProto.ContractStructOrBuilder {
+        // @@protoc_insertion_point(builder_implements:keyvalue.KeyValueData)
+        ch.epfl.dedis.template.proto.KeyValueProto.KeyValueDataOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_ContractStruct_descriptor;
+        return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_KeyValueData_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_ContractStruct_fieldAccessorTable
+        return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_KeyValueData_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.class, ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.Builder.class);
+                ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.class, ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.Builder.class);
       }
 
-      // Construct using ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.newBuilder()
+      // Construct using ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -1043,23 +1043,23 @@ public final class KeyValueProto {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_ContractStruct_descriptor;
+        return ch.epfl.dedis.template.proto.KeyValueProto.internal_static_keyvalue_KeyValueData_descriptor;
       }
 
-      public ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct getDefaultInstanceForType() {
-        return ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.getDefaultInstance();
+      public ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData getDefaultInstanceForType() {
+        return ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.getDefaultInstance();
       }
 
-      public ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct build() {
-        ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct result = buildPartial();
+      public ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData build() {
+        ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct buildPartial() {
-        ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct result = new ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct(this);
+      public ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData buildPartial() {
+        ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData result = new ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData(this);
         int from_bitField0_ = bitField0_;
         if (storageBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -1101,16 +1101,16 @@ public final class KeyValueProto {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct) {
-          return mergeFrom((ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct)other);
+        if (other instanceof ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData) {
+          return mergeFrom((ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct other) {
-        if (other == ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct.getDefaultInstance()) return this;
+      public Builder mergeFrom(ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData other) {
+        if (other == ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData.getDefaultInstance()) return this;
         if (storageBuilder_ == null) {
           if (!other.storage_.isEmpty()) {
             if (storage_.isEmpty()) {
@@ -1155,11 +1155,11 @@ public final class KeyValueProto {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct parsedMessage = null;
+        ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct) e.getUnfinishedMessage();
+          parsedMessage = (ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1420,39 +1420,39 @@ public final class KeyValueProto {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:keyvalue.ContractStruct)
+      // @@protoc_insertion_point(builder_scope:keyvalue.KeyValueData)
     }
 
-    // @@protoc_insertion_point(class_scope:keyvalue.ContractStruct)
-    private static final ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:keyvalue.KeyValueData)
+    private static final ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct();
+      DEFAULT_INSTANCE = new ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData();
     }
 
-    public static ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct getDefaultInstance() {
+    public static ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<ContractStruct>
-        PARSER = new com.google.protobuf.AbstractParser<ContractStruct>() {
-      public ContractStruct parsePartialFrom(
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<KeyValueData>
+        PARSER = new com.google.protobuf.AbstractParser<KeyValueData>() {
+      public KeyValueData parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ContractStruct(input, extensionRegistry);
+          return new KeyValueData(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<ContractStruct> parser() {
+    public static com.google.protobuf.Parser<KeyValueData> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<ContractStruct> getParserForType() {
+    public com.google.protobuf.Parser<KeyValueData> getParserForType() {
       return PARSER;
     }
 
-    public ch.epfl.dedis.template.proto.KeyValueProto.ContractStruct getDefaultInstanceForType() {
+    public ch.epfl.dedis.template.proto.KeyValueProto.KeyValueData getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1464,10 +1464,10 @@ public final class KeyValueProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_keyvalue_KeyValue_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_keyvalue_ContractStruct_descriptor;
+    internal_static_keyvalue_KeyValueData_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_keyvalue_ContractStruct_fieldAccessorTable;
+      internal_static_keyvalue_KeyValueData_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1478,10 +1478,10 @@ public final class KeyValueProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\016keyvalue.proto\022\010keyvalue\"&\n\010KeyValue\022\013" +
-      "\n\003key\030\001 \002(\t\022\r\n\005value\030\002 \002(\014\"5\n\016ContractSt" +
-      "ruct\022#\n\007storage\030\001 \003(\0132\022.keyvalue.KeyValu" +
-      "eB-\n\034ch.epfl.dedis.template.protoB\rKeyVa" +
-      "lueProto"
+      "\n\003key\030\001 \002(\t\022\r\n\005value\030\002 \002(\014\"3\n\014KeyValueDa" +
+      "ta\022#\n\007storage\030\001 \003(\0132\022.keyvalue.KeyValueB" +
+      "-\n\034ch.epfl.dedis.template.protoB\rKeyValu" +
+      "eProto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1501,11 +1501,11 @@ public final class KeyValueProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_keyvalue_KeyValue_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_keyvalue_ContractStruct_descriptor =
+    internal_static_keyvalue_KeyValueData_descriptor =
       getDescriptor().getMessageTypes().get(1);
-    internal_static_keyvalue_ContractStruct_fieldAccessorTable = new
+    internal_static_keyvalue_KeyValueData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_keyvalue_ContractStruct_descriptor,
+        internal_static_keyvalue_KeyValueData_descriptor,
         new java.lang.String[] { "Storage", });
   }
 

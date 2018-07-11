@@ -2,6 +2,7 @@ package omniledger
 
 import (
 	"errors"
+	"log"
 
 	ol "github.com/dedis/cothority/omniledger/service"
 	"github.com/dedis/protobuf"
@@ -33,6 +34,7 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 			return
 		}
 
+		log.Printf("Created new keyvalue at %x", inst.DeriveID(ContractKeyValueID))
 		// Then create a StateChange request with the data of the instance. The
 		// InstanceID is given by the DeriveID method of the instruction that allows
 		// to create multiple instanceIDs out of a given instruction in a pseudo-
@@ -53,7 +55,7 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 		//  3. encode the data into protobuf again
 		var csBuf []byte
 		csBuf, _, err = cdb.GetValues(inst.InstanceID.Slice())
-		cs := ContractStruct{}
+		cs := KeyValueData{}
 		err = protobuf.Decode(csBuf, &cs)
 		if err != nil {
 			return
@@ -82,8 +84,8 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 
 // NewContractStruct returns an initialised ContractStruct with all key/value
 // pairs from the arguments.
-func NewContractStruct(args ol.Arguments) ContractStruct {
-	cs := ContractStruct{}
+func NewContractStruct(args ol.Arguments) KeyValueData {
+	cs := KeyValueData{}
 	for _, kv := range args {
 		cs.Storage = append(cs.Storage, KeyValue{kv.Name, kv.Value})
 	}
@@ -94,7 +96,7 @@ func NewContractStruct(args ol.Arguments) ContractStruct {
 //  - updates the value if the key already exists
 //  - deletes the keyvalue if the value is empty
 //  - adds a new keyValue if the key does not exist yet
-func (cs *ContractStruct) Update(args ol.Arguments) {
+func (cs *KeyValueData) Update(args ol.Arguments) {
 	for _, kv := range args {
 		var updated bool
 		for i, stored := range cs.Storage {

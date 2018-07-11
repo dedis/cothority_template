@@ -12,7 +12,7 @@ message KeyValue {
   required bytes value = 2;
 }
 
-// ContractStruct is the structure that will hold all key/value pairs.
-message ContractStruct {
+// KeyValueData is the structure that will hold all key/value pairs.
+message KeyValueData {
   repeated KeyValue storage = 1;
 }

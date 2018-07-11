@@ -43,6 +43,7 @@ addition:
 - [service](service) - create a long-term service that can spawn any number of protocols
 - [app](app) - write an app that will interact with, or spawn, a cothority
 - [simulation](simulation) - how to create a simulation of a protocol or service
+- [omniledger](omniledger) - how to write a contract using OmniLedger (early alpha!)
 
 This repo is geared towards PhD-students who want to add a new functionality to
 the cothority by creating their own protocols, services, simulations or apps.

@@ -10,7 +10,6 @@ MAILCMD=/usr/bin/mail
 
 # Find out which package this copy of run_conode.sh is checked into.
 dir=$(dirname $(realpath $0))
-pkg=`cd $dir && go list ..`
 all_args="$*"
 
 # increment version sub if there's something about cothority that changes
@@ -26,6 +25,12 @@ VERSION="$VERSION_ONET-$VERSION_SUB"
 # build tags to all calls to go. For example to turn on vartime algorithms:
 #   TAGS="-tags vartime" ./run_conode.sh
 # Note: TAGS is also used by the integration tests.
+
+# This will allow you to put the servers on a different range if you want.
+#   $ export PORTBASE=18000
+#   $ ./run_conode.sh local 3
+# Results in the servers being on 18002-18007.
+[ -z "$PORTBASE" ] && PORTBASE=7000
 
 main(){
 	if [ ! "$1" ]; then
@@ -45,6 +50,7 @@ main(){
 		PATH=$PATH:$gopath/bin
 		export PATH
 	fi
+
 	case $( uname ) in
 	Darwin)
 		PATH_CO=~/Library
@@ -80,7 +86,7 @@ public				# runs a public conode - supposes it's already configured
 	-update			# will automatically update the repositories
 	-mail			# every time the cothority restarts, the last 200 lines get sent
 					# to $MAILADDR
-	-debug 3		# Set the debug-level for the conode-run
+	-debug 2		# Set the debug-level for the conode-run (default: 2)
 	-memory 500		# Restarts the process if it exceeds 500MBytes
 
 local nbr [dbg_lvl]	# runs nbr local conodes - you can give a debug-level as second
@@ -96,7 +102,8 @@ runLocal(){
 	NBR=$1
 	shift
 	WAIT=""
-	DEBUG=1
+	DEBUG=2
+	local BUILD=true
 	while [ "$1" ]; do
 		case $1 in
 		-update)
@@ -109,6 +116,9 @@ runLocal(){
 		-wait_for_apocalypse|-wait)
 			WAIT=true
 			;;
+		-nobuild)
+			BUILD=false
+			;;
 		*)
 			DEBUG=$1
 			;;
@@ -117,7 +127,10 @@ runLocal(){
 	done
 
 	killall -9 conode || true
-	go install $TAGS $pkg/conode
+	if [ "$BUILD" = "true" ]; then
+		pkg=`cd $dir && go list ..`
+		go install $TAGS $pkg/conode
+	fi
 
 	rm -f public.toml
 	for n in $( seq $NBR ); do
@@ -135,7 +148,7 @@ runLocal(){
 		fi
 
 		if [ ! -d $co ]; then
-			echo -e "localhost:$((7000 + 2 * $n))\nConode_$n\n$co" | conode setup
+			echo -e "localhost:$(($PORTBASE + 2 * $n))\nConode_$n\n$co" | conode setup
 		fi
 		conode -d $DEBUG -c $co/private.toml server &
 		cat $co/public.toml >> public.toml
@@ -161,7 +174,7 @@ EOF
 runPublic(){
 	# Get all arguments
 	ARGS=""
-	DEBUG=0
+	DEBUG=2
 	while [ "$1" ]; do
 		case $1 in
 		-update)
@@ -179,7 +192,6 @@ runPublic(){
 		-mail)
 			if [ -x $MAILCMD ]; then
 				MAIL=yes
-				DEBUG=3
 			else
 				echo "$MAILCMD not found - install using"
 				echo "sudo apt-get install bsd-mailx"
@@ -202,6 +214,7 @@ runPublic(){
 	if [ "$UPDATE" ]; then
 		update
 	else
+		pkg=`cd $dir && go list ..`
 		go install $TAGS $pkg/conode
 	fi
 	migrate
@@ -300,6 +313,7 @@ update(){
 	TEST=$1
 	cat - > $TMP << EOF
 if [ ! "$TEST" ]; then
+  pkg=`cd $dir && go list ..`
   go get -u $pkg/...
 fi
 exec $0 $ACTION -update_rec $TMP

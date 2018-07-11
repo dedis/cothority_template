@@ -14,7 +14,7 @@ type KeyValue struct {
 	Value []byte
 }
 
-// ContractStruct is the structure that will hold all key/value pairs.
-type ContractStruct struct {
+// KeyValueData is the structure that will hold all key/value pairs.
+type KeyValueData struct {
 	Storage []KeyValue
 }
