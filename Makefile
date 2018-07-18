@@ -33,3 +33,14 @@ test_go:
 	go test -race -short ./...
 
 test: test_fmt test_lint test_go
+
+proto:
+	./proto.sh
+	make -C external
+
+docker: conode/Dockerfile external/docker/Dockerfile
+	cd conode/; make docker_dev
+	cd external/docker/; make docker_test
+
+test_java: docker
+	cd external/java; mvn test
