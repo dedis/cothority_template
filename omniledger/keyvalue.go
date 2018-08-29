@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/dedis/cothority/omniledger/darc"
 	ol "github.com/dedis/cothority/omniledger/service"
 	"github.com/dedis/protobuf"
 )
@@ -23,8 +24,20 @@ var ContractKeyValueID = "keyValue"
 // Existing keyValue instances can be "update"d and deleted.
 func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin) (scs []ol.StateChange, cOut []ol.Coin, err error) {
 	cOut = cIn
-	switch {
-	case inst.Spawn != nil:
+
+	err = inst.VerifyDarcSignature(cdb)
+	if err != nil {
+		return
+	}
+
+	var darcID darc.ID
+	_, _, darcID, err = cdb.GetValues(inst.InstanceID.Slice())
+	if err != nil {
+		return
+	}
+
+	switch inst.GetType() {
+	case ol.SpawnType:
 		// Spawn a new instance of the KeyValue contract.
 		// First create a new ContractStruct and encode it as a protobuf.
 		cs := NewContractStruct(inst.Spawn.Args)
@@ -34,17 +47,18 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 			return
 		}
 
-		log.Printf("Created new keyvalue at %x", inst.DeriveID(ContractKeyValueID))
+		instID := inst.DeriveID("")
+		log.Printf("Created new keyvalue at %x", instID)
 		// Then create a StateChange request with the data of the instance. The
 		// InstanceID is given by the DeriveID method of the instruction that allows
 		// to create multiple instanceIDs out of a given instruction in a pseudo-
 		// random way that will be the same for all nodes.
 		scs = []ol.StateChange{
-			ol.NewStateChange(ol.Create, inst.DeriveID(ContractKeyValueID), ContractKeyValueID, csBuf),
+			ol.NewStateChange(ol.Create, instID, ContractKeyValueID, csBuf, darcID),
 		}
 		return
 
-	case inst.Invoke != nil:
+	case ol.InvokeType:
 		if inst.Invoke.Command != "update" {
 			return nil, nil, errors.New("Value contract can only update")
 		}
@@ -54,7 +68,7 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 		//  2. update the data
 		//  3. encode the data into protobuf again
 		var csBuf []byte
-		csBuf, _, err = cdb.GetValues(inst.InstanceID.Slice())
+		csBuf, _, _, err = cdb.GetValues(inst.InstanceID.Slice())
 		cs := KeyValueData{}
 		err = protobuf.Decode(csBuf, &cs)
 		if err != nil {
@@ -67,14 +81,14 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 		}
 		scs = []ol.StateChange{
 			ol.NewStateChange(ol.Update, inst.InstanceID,
-				ContractKeyValueID, csBuf),
+				ContractKeyValueID, csBuf, darcID),
 		}
 		return
 
-	case inst.Delete != nil:
+	case ol.DeleteType:
 		// Delete removes all the data from the global state.
 		scs = ol.StateChanges{
-			ol.NewStateChange(ol.Remove, inst.InstanceID, ContractKeyValueID, nil),
+			ol.NewStateChange(ol.Remove, inst.InstanceID, ContractKeyValueID, nil, darcID),
 		}
 		return
 	}
