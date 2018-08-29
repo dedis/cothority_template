@@ -6,7 +6,7 @@
 
     <groupId>ch.epfl.dedis</groupId>
     <artifactId>cothority_template</artifactId>
-    <version>master-1807011</version>
+    <version>master-SNAPSHOT</version>
     <name>Cothority Template in Java</name>
     <description>Template examples of how to interact with the cothority</description>
     <url>https://github.com/dedis/cothority_template</url>
@@ -177,7 +177,7 @@
         <dependency>
             <groupId>ch.epfl.dedis</groupId>
             <artifactId>cothority</artifactId>
-            <version>master-180717</version>
+            <version>master-SNAPSHOT</version>
         </dependency>
 
         <!-- dependencies required for compilation -->

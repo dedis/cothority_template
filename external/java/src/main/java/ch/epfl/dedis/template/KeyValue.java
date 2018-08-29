@@ -1,6 +1,5 @@
 package ch.epfl.dedis.template;
 
-import ch.epfl.dedis.lib.Sha256id;
 import ch.epfl.dedis.lib.omniledger.Argument;
 import ch.epfl.dedis.template.proto.KeyValueProto;
 
