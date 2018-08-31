@@ -7,7 +7,7 @@ import (
 
 	"github.com/dedis/cothority"
 	"github.com/dedis/cothority/omniledger/darc"
-	"github.com/dedis/cothority/omniledger/service"
+	ol "github.com/dedis/cothority/omniledger/service"
 	"github.com/dedis/onet"
 	"github.com/dedis/protobuf"
 	"github.com/stretchr/testify/require"
@@ -21,7 +21,7 @@ func TestKeyValue_Spawn(t *testing.T) {
 	// Create a new instance with two key/values:
 	//  "one": []byte{1}
 	//  "two": []byte{2}
-	args := service.Arguments{
+	args := ol.Arguments{
 		{
 			Name:  "one",
 			Value: []byte{1},
@@ -62,7 +62,7 @@ func TestKeyValue_Invoke(t *testing.T) {
 	// Create a new instance with two key/values:
 	//  "one": []byte{1}
 	//  "two": []byte{2}
-	args := service.Arguments{
+	args := ol.Arguments{
 		{
 			Name:  "one",
 			Value: []byte{1},
@@ -80,7 +80,7 @@ func TestKeyValue_Invoke(t *testing.T) {
 	require.Nil(t, err)
 
 	// Delete the key "one", change "two" and add a "three"
-	args = service.Arguments{
+	args = ol.Arguments{
 		{
 			Name:  "one",
 			Value: nil,
@@ -134,27 +134,27 @@ func TestContractStruct_Update(t *testing.T) {
 		}},
 	}
 
-	cs.Update(service.Arguments{{
+	cs.Update(ol.Arguments{{
 		Name:  "one",
 		Value: []byte{2},
 	}})
 	require.Equal(t, 1, len(cs.Storage))
 	require.Equal(t, []byte{2}, cs.Storage[0].Value)
 
-	cs.Update(service.Arguments{{
+	cs.Update(ol.Arguments{{
 		Name:  "one",
 		Value: nil,
 	}})
 	require.Equal(t, 0, len(cs.Storage))
 
-	cs.Update(service.Arguments{{
+	cs.Update(ol.Arguments{{
 		Name:  "two",
 		Value: []byte{22},
 	}})
 	require.Equal(t, 1, len(cs.Storage))
 	require.Equal(t, []byte{22}, cs.Storage[0].Value)
 
-	cs.Update(service.Arguments{{
+	cs.Update(ol.Arguments{{
 		Name:  "two",
 		Value: []byte{},
 	}})
@@ -168,8 +168,8 @@ type olTest struct {
 	signer  darc.Signer
 	servers []*onet.Server
 	roster  *onet.Roster
-	cl      *service.Client
-	gMsg    *service.CreateGenesisBlock
+	cl      *ol.Client
+	gMsg    *ol.CreateGenesisBlock
 	gDarc   *darc.Darc
 }
 
@@ -180,12 +180,12 @@ func newOLTest(t *testing.T) (olt *olTest) {
 
 	olt.signer = darc.NewSignerEd25519(nil, nil)
 	olt.servers, olt.roster, _ = olt.local.GenTree(3, true)
-	olt.cl = service.NewClient()
+	olt.cl = ol.NewClient()
 
 	// Then create a new omniledger with the genesis darc having the right
 	// to create and update keyValue contracts.
 	var err error
-	olt.gMsg, err = service.DefaultGenesisMsg(service.CurrentVersion, olt.roster,
+	olt.gMsg, err = ol.DefaultGenesisMsg(ol.CurrentVersion, olt.roster,
 		[]string{"spawn:keyValue", "spawn:darc", "invoke:update"}, olt.signer.Identity())
 	require.Nil(t, err)
 	olt.gDarc = &olt.gMsg.GenesisDarc
@@ -203,17 +203,14 @@ func (olt *olTest) Close() {
 	olt.local.CloseAll()
 }
 
-func (olt *olTest) createInstance(t *testing.T, args service.Arguments) service.InstanceID {
-	ctx := service.ClientTransaction{
-		Instructions: []service.Instruction{{
-			InstanceID: service.InstanceID{
-				DarcID: olt.gDarc.GetBaseID(),
-				SubID:  service.SubID{},
-			},
-			Nonce:  service.Nonce{},
-			Index:  0,
-			Length: 1,
-			Spawn: &service.Spawn{
+func (olt *olTest) createInstance(t *testing.T, args ol.Arguments) ol.InstanceID {
+	ctx := ol.ClientTransaction{
+		Instructions: []ol.Instruction{{
+			InstanceID: ol.NewInstanceID(olt.gDarc.GetBaseID()),
+			Nonce:      ol.Nonce{},
+			Index:      0,
+			Length:     1,
+			Spawn: &ol.Spawn{
 				ContractID: ContractKeyValueID,
 				Args:       args,
 			},
@@ -221,24 +218,24 @@ func (olt *olTest) createInstance(t *testing.T, args service.Arguments) service.
 	}
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.Nil(t, ctx.Instructions[0].SignBy(olt.signer))
+	require.Nil(t, ctx.Instructions[0].SignBy(olt.gDarc.GetBaseID(), olt.signer))
 
 	// Sending this transaction to OmniLedger does not directly include it in the
 	// global state - first we must wait for the new block to be created.
 	var err error
 	_, err = olt.cl.AddTransaction(ctx)
 	require.Nil(t, err)
-	return ctx.Instructions[0].DeriveID(ContractKeyValueID)
+	return ctx.Instructions[0].DeriveID("")
 }
 
-func (olt *olTest) updateInstance(t *testing.T, instID service.InstanceID, args service.Arguments) {
-	ctx := service.ClientTransaction{
-		Instructions: []service.Instruction{{
+func (olt *olTest) updateInstance(t *testing.T, instID ol.InstanceID, args ol.Arguments) {
+	ctx := ol.ClientTransaction{
+		Instructions: []ol.Instruction{{
 			InstanceID: instID,
-			Nonce:      service.Nonce{},
+			Nonce:      ol.Nonce{},
 			Index:      0,
 			Length:     1,
-			Invoke: &service.Invoke{
+			Invoke: &ol.Invoke{
 				Command: "update",
 				Args:    args,
 			},
@@ -246,7 +243,7 @@ func (olt *olTest) updateInstance(t *testing.T, instID service.InstanceID, args 
 	}
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.Nil(t, ctx.Instructions[0].SignBy(olt.signer))
+	require.Nil(t, ctx.Instructions[0].SignBy(olt.gDarc.GetBaseID(), olt.signer))
 
 	// Sending this transaction to OmniLedger does not directly include it in the
 	// global state - first we must wait for the new block to be created.

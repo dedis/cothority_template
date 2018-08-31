@@ -10,8 +10,10 @@ import ch.epfl.dedis.lib.omniledger.InstanceId;
 import ch.epfl.dedis.lib.omniledger.OmniledgerRPC;
 import ch.epfl.dedis.lib.omniledger.contracts.DarcInstance;
 import ch.epfl.dedis.lib.omniledger.darc.Darc;
+import ch.epfl.dedis.lib.omniledger.darc.Rules;
 import ch.epfl.dedis.lib.omniledger.darc.Signer;
 import ch.epfl.dedis.lib.omniledger.darc.SignerEd25519;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +47,7 @@ public class KeyValueTest {
     void initAll() throws Exception {
         testInstanceController = TestServerInit.getInstance();
         admin = new SignerEd25519();
-        Map<String, byte[]> rules = Darc.initRules(Arrays.asList(admin.getIdentity()),
+        Rules rules = Darc.initRules(Arrays.asList(admin.getIdentity()),
                 Arrays.asList(admin.getIdentity()));
         genesisDarc = new Darc(rules, "genesis".getBytes());
 
@@ -103,7 +104,9 @@ public class KeyValueTest {
     void reconnect() throws Exception {
         KeyValue mKV = new KeyValue("value", "314159".getBytes());
         KeyValueInstance vi = new KeyValueInstance(ol, genesisDarcInstance, admin, Arrays.asList(mKV));
-        reconnect_client(ol.getRoster(), ol.getLatest().getSkipchainId(), vi.getId());
+        assertEquals(mKV, vi.getKeyValues().get(0));
+
+        reconnect_client(ol.getRoster(), ol.getGenesis().getSkipchainId(), vi.getId());
     }
 
     /**
@@ -114,7 +117,7 @@ public class KeyValueTest {
      * @param scId the Id of OmniLedger
      * @param kvId the Id of the instance to retrieve
      */
-    void reconnect_client(Roster ro, SkipblockId scId, InstanceId kvId) throws CothorityException {
+    void reconnect_client(Roster ro, SkipblockId scId, InstanceId kvId) throws CothorityException, InvalidProtocolBufferException {
         OmniledgerRPC localOl = new OmniledgerRPC(ro, scId);
         assertTrue(localOl.checkLiveness());
 

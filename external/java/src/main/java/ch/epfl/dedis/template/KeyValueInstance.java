@@ -139,9 +139,9 @@ public class KeyValueInstance {
             args.add(new Argument(kv.getKey(), kv.getValue()));
         }
         Invoke inv = new Invoke("update", args);
-        Instruction inst = new Instruction(instance.getId(), SubId.random().getId(), pos, len, inv);
+        Instruction inst = new Instruction(instance.getId(), Instruction.genNonce(), pos, len, inv);
         try {
-            Request r = new Request(instance.getId().getDarcId(), "invoke:update", inst.hash(),
+            Request r = new Request(instance.getDarcId(), "invoke:update", inst.hash(),
                     Arrays.asList(owner.getIdentity()), null);
             logger.info("Signing: {}", Hex.printHexBinary(r.hash()));
             Signature sign = new Signature(owner.sign(r.hash()), owner.getIdentity());
@@ -160,11 +160,10 @@ public class KeyValueInstance {
      * @return a TransactionId pointing to the transaction that should be included
      * @throws CothorityException
      */
-    public TransactionId updateKeyValue(List<KeyValue> keyValues, Signer owner) throws CothorityException {
+    public void updateKeyValue(List<KeyValue> keyValues, Signer owner) throws CothorityException {
         Instruction inst = updateKeyValueInstruction(keyValues, owner, 0, 1);
         ClientTransaction ct = new ClientTransaction(Arrays.asList(inst));
         ol.sendTransaction(ct);
-        return new TransactionId(instance.getId().getDarcId(), SubId.zero());
     }
 
     /**
