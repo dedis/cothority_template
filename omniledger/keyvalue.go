@@ -2,7 +2,6 @@ package omniledger
 
 import (
 	"errors"
-	"log"
 
 	"github.com/dedis/cothority/omniledger/darc"
 	ol "github.com/dedis/cothority/omniledger/service"
@@ -48,7 +47,6 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 		}
 
 		instID := inst.DeriveID("")
-		log.Printf("Created new keyvalue at %x", instID)
 		// Then create a StateChange request with the data of the instance. The
 		// InstanceID is given by the DeriveID method of the instruction that allows
 		// to create multiple instanceIDs out of a given instruction in a pseudo-
