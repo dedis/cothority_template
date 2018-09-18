@@ -4,15 +4,15 @@ import ch.epfl.dedis.integration.TestServerController;
 import ch.epfl.dedis.integration.TestServerInit;
 import ch.epfl.dedis.lib.Roster;
 import ch.epfl.dedis.lib.SkipblockId;
+import ch.epfl.dedis.lib.byzcoin.ByzCoinRPC;
 import ch.epfl.dedis.lib.exception.CothorityCommunicationException;
 import ch.epfl.dedis.lib.exception.CothorityException;
-import ch.epfl.dedis.lib.omniledger.InstanceId;
-import ch.epfl.dedis.lib.omniledger.OmniledgerRPC;
-import ch.epfl.dedis.lib.omniledger.contracts.DarcInstance;
-import ch.epfl.dedis.lib.omniledger.darc.Darc;
-import ch.epfl.dedis.lib.omniledger.darc.Rules;
-import ch.epfl.dedis.lib.omniledger.darc.Signer;
-import ch.epfl.dedis.lib.omniledger.darc.SignerEd25519;
+import ch.epfl.dedis.lib.byzcoin.InstanceId;
+import ch.epfl.dedis.lib.byzcoin.contracts.DarcInstance;
+import ch.epfl.dedis.lib.byzcoin.darc.Darc;
+import ch.epfl.dedis.lib.byzcoin.darc.Rules;
+import ch.epfl.dedis.lib.byzcoin.darc.Signer;
+import ch.epfl.dedis.lib.byzcoin.darc.SignerEd25519;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class KeyValueTest {
-    static OmniledgerRPC ol;
+    static ByzCoinRPC bc;
 
     static Signer admin;
     static Darc genesisDarc;
@@ -37,8 +37,8 @@ public class KeyValueTest {
     private TestServerController testInstanceController;
 
     /**
-     * Initializes a new OmniLedger instance and adds a genesis darc with evolve rights to the admin.
-     * The new OmniLedger is empty and will create new blocks every 500ms, which is good for tests,
+     * Initializes a new ByzCoin ledger and adds a genesis darc with evolve rights to the admin.
+     * The new ledger is empty and will create new blocks every 500ms, which is good for tests,
      * but in a real implementation would be more like 5s.
      *
      * @throws Exception
@@ -51,14 +51,14 @@ public class KeyValueTest {
                 Arrays.asList(admin.getIdentity()));
         genesisDarc = new Darc(rules, "genesis".getBytes());
 
-        ol = new OmniledgerRPC(testInstanceController.getRoster(), genesisDarc, Duration.of(500, MILLIS));
-        if (!ol.checkLiveness()) {
+        bc = new ByzCoinRPC(testInstanceController.getRoster(), genesisDarc, Duration.of(500, MILLIS));
+        if (!bc.checkLiveness()) {
             throw new CothorityCommunicationException("liveness check failed");
         }
 
         // Show how to evolve a darc to add new rules. We could've also create a correct genesis darc in the
         // lines above by adding all rules. But for testing purposes this shows how to add new rules to a darc.
-        genesisDarcInstance = new DarcInstance(ol, genesisDarc);
+        genesisDarcInstance = new DarcInstance(bc, genesisDarc);
         Darc darc2 = genesisDarc.copy();
         darc2.setRule("spawn:keyValue", admin.getIdentity().toString().getBytes());
         darc2.setRule("invoke:update", admin.getIdentity().toString().getBytes());
@@ -72,7 +72,7 @@ public class KeyValueTest {
      */
     @Test
     void ping() throws Exception {
-        assertTrue(ol.checkLiveness());
+        assertTrue(bc.checkLiveness());
     }
 
     /**
@@ -87,7 +87,7 @@ public class KeyValueTest {
     void spawnValue() throws Exception {
         KeyValue mKV = new KeyValue("value", "314159".getBytes());
 
-        KeyValueInstance vi = new KeyValueInstance(ol, genesisDarcInstance, admin, Arrays.asList(mKV));
+        KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, Arrays.asList(mKV));
         assertEquals(mKV, vi.getKeyValues().get(0));
 
         mKV.setValue("27".getBytes());
@@ -103,25 +103,25 @@ public class KeyValueTest {
     @Test
     void reconnect() throws Exception {
         KeyValue mKV = new KeyValue("value", "314159".getBytes());
-        KeyValueInstance vi = new KeyValueInstance(ol, genesisDarcInstance, admin, Arrays.asList(mKV));
+        KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, Arrays.asList(mKV));
         assertEquals(mKV, vi.getKeyValues().get(0));
 
-        reconnect_client(ol.getRoster(), ol.getGenesis().getSkipchainId(), vi.getId());
+        reconnect_client(bc.getRoster(), bc.getGenesis().getSkipchainId(), vi.getId());
     }
 
     /**
-     * Re-connects to an OmniLedger instance and verifies the value stored in the keyValue instance. This shows
+     * Re-connects to a ByzCoin ledger and verifies the value stored in the keyValue instance. This shows
      * how to use the minimal information necessary to get the data from an instance.
      *
-     * @param ro   the roster of OmniLedger
-     * @param scId the Id of OmniLedger
+     * @param ro   the roster of ByzCoin
+     * @param scId the Id of ByzCoin
      * @param kvId the Id of the instance to retrieve
      */
     void reconnect_client(Roster ro, SkipblockId scId, InstanceId kvId) throws CothorityException, InvalidProtocolBufferException {
-        OmniledgerRPC localOl = new OmniledgerRPC(ro, scId);
-        assertTrue(localOl.checkLiveness());
+        ByzCoinRPC bc = new ByzCoinRPC(ro, scId);
+        assertTrue(bc.checkLiveness());
 
-        KeyValueInstance localKvi = new KeyValueInstance(localOl, kvId);
+        KeyValueInstance localKvi = new KeyValueInstance(bc, kvId);
         KeyValue testKv = new KeyValue("value", "314159".getBytes());
         assertEquals(testKv, localKvi.getKeyValues().get(0));
     }

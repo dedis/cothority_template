@@ -1,10 +1,10 @@
-package omniledger
+package byzcoin
 
 import (
 	"errors"
 
-	"github.com/dedis/cothority/omniledger/darc"
-	ol "github.com/dedis/cothority/omniledger/service"
+	"github.com/dedis/cothority/byzcoin"
+	"github.com/dedis/cothority/byzcoin/darc"
 	"github.com/dedis/protobuf"
 )
 
@@ -21,7 +21,7 @@ var ContractKeyValueID = "keyValue"
 // It can spawn new keyValue instances and will store all the arguments in
 // the data field.
 // Existing keyValue instances can be "update"d and deleted.
-func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin) (scs []ol.StateChange, cOut []ol.Coin, err error) {
+func ContractKeyValue(cdb byzcoin.CollectionView, inst byzcoin.Instruction, cIn []byzcoin.Coin) (scs []byzcoin.StateChange, cOut []byzcoin.Coin, err error) {
 	cOut = cIn
 
 	err = inst.VerifyDarcSignature(cdb)
@@ -36,7 +36,7 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 	}
 
 	switch inst.GetType() {
-	case ol.SpawnType:
+	case byzcoin.SpawnType:
 		// Spawn a new instance of the KeyValue contract.
 		// First create a new ContractStruct and encode it as a protobuf.
 		cs := NewContractStruct(inst.Spawn.Args)
@@ -51,12 +51,12 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 		// InstanceID is given by the DeriveID method of the instruction that allows
 		// to create multiple instanceIDs out of a given instruction in a pseudo-
 		// random way that will be the same for all nodes.
-		scs = []ol.StateChange{
-			ol.NewStateChange(ol.Create, instID, ContractKeyValueID, csBuf, darcID),
+		scs = []byzcoin.StateChange{
+			byzcoin.NewStateChange(byzcoin.Create, instID, ContractKeyValueID, csBuf, darcID),
 		}
 		return
 
-	case ol.InvokeType:
+	case byzcoin.InvokeType:
 		if inst.Invoke.Command != "update" {
 			return nil, nil, errors.New("Value contract can only update")
 		}
@@ -77,16 +77,16 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 		if err != nil {
 			return
 		}
-		scs = []ol.StateChange{
-			ol.NewStateChange(ol.Update, inst.InstanceID,
+		scs = []byzcoin.StateChange{
+			byzcoin.NewStateChange(byzcoin.Update, inst.InstanceID,
 				ContractKeyValueID, csBuf, darcID),
 		}
 		return
 
-	case ol.DeleteType:
+	case byzcoin.DeleteType:
 		// Delete removes all the data from the global state.
-		scs = ol.StateChanges{
-			ol.NewStateChange(ol.Remove, inst.InstanceID, ContractKeyValueID, nil, darcID),
+		scs = byzcoin.StateChanges{
+			byzcoin.NewStateChange(byzcoin.Remove, inst.InstanceID, ContractKeyValueID, nil, darcID),
 		}
 		return
 	}
@@ -96,7 +96,7 @@ func ContractKeyValue(cdb ol.CollectionView, inst ol.Instruction, cIn []ol.Coin)
 
 // NewContractStruct returns an initialised ContractStruct with all key/value
 // pairs from the arguments.
-func NewContractStruct(args ol.Arguments) KeyValueData {
+func NewContractStruct(args byzcoin.Arguments) KeyValueData {
 	cs := KeyValueData{}
 	for _, kv := range args {
 		cs.Storage = append(cs.Storage, KeyValue{kv.Name, kv.Value})
@@ -108,7 +108,7 @@ func NewContractStruct(args ol.Arguments) KeyValueData {
 //  - updates the value if the key already exists
 //  - deletes the keyvalue if the value is empty
 //  - adds a new keyValue if the key does not exist yet
-func (cs *KeyValueData) Update(args ol.Arguments) {
+func (cs *KeyValueData) Update(args byzcoin.Arguments) {
 	for _, kv := range args {
 		var updated bool
 		for i, stored := range cs.Storage {

@@ -1,4 +1,4 @@
-package omniledger
+package byzcoin
 
 // PROTOSTART
 // package keyvalue;
