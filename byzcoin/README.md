@@ -1,16 +1,16 @@
 Navigation: [DEDIS](https://github.com/dedis/doc/tree/master/README.md) ::
 [../README.md](Cothority Template) ::
-OmniLedger Example
+ByzCoin Example
 
-# OmniLedger Example
+# ByzCoin Example
 
-The files in this directory give an overview of how to use OmniLedger with
+The files in this directory give an overview of how to use ByzCoin with
 your own code and writing your own contract.
 Before reading on, be sure that you read and understand the documentation found
-here: [https://github.com/dedis/cothority/tree/master/omniledger/README.md](OmniLedger Documentation).
+here: [https://github.com/dedis/cothority/tree/master/byzcoin/README.md](ByzCoin Documentation).
 
 When writing a contract, you first have to think what you want to store in
-OmniLedger and how you can verify if the data is valid or not. Your contract
+ByzCoin and how you can verify if the data is valid or not. Your contract
 will be called by `Instruction`s inside `ClientTransaction`s in two ways:
 
 1. when a client requests a new instance he will send a `Spawn` to a darc that
@@ -18,7 +18,7 @@ has the appropriate permissions and this darc will spawn your new contract
 2. when a client sends an `Instruction` directly to the already existing
 instance
 
-When the `ClientTransaction` arrives at the OmniLedger service, it will be queued,
+When the `ClientTransaction` arrives at the ByzCoin service, it will be queued,
 and then batched together with other transactions to form a new block. This block
 will be verified by all nodes, so every node will run _all_ the `ClientTransaction`s
 and verify that the output is correct.
@@ -28,7 +28,7 @@ your contract, as this will be different on every node!
 ## Key Value storage and update
 
 This is a better version of the
-[https://github.com/dedis/cothority/tree/master/omniledger/contracts/value.go](value contract).
+[https://github.com/dedis/cothority/tree/master/byzcoin/contracts/value.go](value contract).
 It holds a set of key/value pairs and lets you update, add and remove key/value
 pairs.
 
@@ -46,7 +46,7 @@ A typical use case is:
 
 ## Java API
 
-There is a java-api with all the necessary definitions to interact with OmniLedger
+There is a java-api with all the necessary definitions to interact with ByzCoin
 and the new contract.
 The java files are stored here: [../external/java](java files)
 
@@ -64,9 +64,9 @@ Every time you change the go-code, you need to update the docker.
 
 The following files are in this directory:
 
-- `service.go` only serves to register the contract with OmniLedger. If you
+- `service.go` only serves to register the contract with ByzCoin. If you
 want to give more power to your service, be sure to look at the
-[../service](OmniLedger service example).
+[../service](service example).
 - `keyvalue.go` defines the contract
 - `proto.go` has the definitions that will be translated into protobuf
 

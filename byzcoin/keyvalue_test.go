@@ -1,4 +1,4 @@
-package omniledger
+package byzcoin
 
 import (
 	"bytes"
@@ -6,22 +6,22 @@ import (
 	"time"
 
 	"github.com/dedis/cothority"
-	"github.com/dedis/cothority/omniledger/darc"
-	ol "github.com/dedis/cothority/omniledger/service"
+	"github.com/dedis/cothority/byzcoin"
+	"github.com/dedis/cothority/byzcoin/darc"
 	"github.com/dedis/onet"
 	"github.com/dedis/protobuf"
 	"github.com/stretchr/testify/require"
 )
 
 func TestKeyValue_Spawn(t *testing.T) {
-	// Create a new omniledger and prepare for proper closing
-	olt := newOLTest(t)
-	defer olt.Close()
+	// Create a new ledger and prepare for proper closing
+	bct := newBCTest(t)
+	defer bct.Close()
 
 	// Create a new instance with two key/values:
 	//  "one": []byte{1}
 	//  "two": []byte{2}
-	args := ol.Arguments{
+	args := byzcoin.Arguments{
 		{
 			Name:  "one",
 			Value: []byte{1},
@@ -31,11 +31,11 @@ func TestKeyValue_Spawn(t *testing.T) {
 			Value: []byte{2},
 		},
 	}
-	// And send it to OmniLedger.
-	instID := olt.createInstance(t, args)
+	// And send it to the ledger.
+	instID := bct.createInstance(t, args)
 
 	// Wait for the proof to be available.
-	pr, err := olt.cl.WaitProof(instID, olt.gMsg.BlockInterval, nil)
+	pr, err := bct.cl.WaitProof(instID, bct.gMsg.BlockInterval, nil)
 	require.Nil(t, err)
 	// Make sure the proof is a matching proof and not a proof of absence.
 	require.True(t, pr.InclusionProof.Match())
@@ -55,14 +55,14 @@ func TestKeyValue_Spawn(t *testing.T) {
 }
 
 func TestKeyValue_Invoke(t *testing.T) {
-	// Create a new omniledger and prepare for proper closing
-	olt := newOLTest(t)
-	defer olt.Close()
+	// Create a new ledger and prepare for proper closing
+	bct := newBCTest(t)
+	defer bct.Close()
 
 	// Create a new instance with two key/values:
 	//  "one": []byte{1}
 	//  "two": []byte{2}
-	args := ol.Arguments{
+	args := byzcoin.Arguments{
 		{
 			Name:  "one",
 			Value: []byte{1},
@@ -72,15 +72,15 @@ func TestKeyValue_Invoke(t *testing.T) {
 			Value: []byte{2},
 		},
 	}
-	// And send it to OmniLedger.
-	instID := olt.createInstance(t, args)
+	// And send it to the ledger.
+	instID := bct.createInstance(t, args)
 
 	// Wait for the proof to be available.
-	pr1, err := olt.cl.WaitProof(instID, olt.gMsg.BlockInterval, nil)
+	pr1, err := bct.cl.WaitProof(instID, bct.gMsg.BlockInterval, nil)
 	require.Nil(t, err)
 
 	// Delete the key "one", change "two" and add a "three"
-	args = ol.Arguments{
+	args = byzcoin.Arguments{
 		{
 			Name:  "one",
 			Value: nil,
@@ -94,23 +94,23 @@ func TestKeyValue_Invoke(t *testing.T) {
 			Value: []byte{3},
 		},
 	}
-	olt.updateInstance(t, instID, args)
+	bct.updateInstance(t, instID, args)
 
 	// Wait for the new values to be written.
 	// Store the values of the previous proof in 'values'
 	_, values1, err := pr1.KeyValue()
 	require.Nil(t, err)
 	var values2 [][]byte
-	// Try 10 times to get other values than that from OmniLedger.
+	// Try 10 times to get other values than that from the ledger.
 	var i int
 	for i = 0; i < 10; i++ {
-		prRep2, err := olt.cl.GetProof(instID.Slice())
+		prRep2, err := bct.cl.GetProof(instID.Slice())
 		require.Nil(t, err)
 		_, values2, err = prRep2.Proof.KeyValue()
 		if bytes.Compare(values1[0], values2[0]) != 0 {
 			break
 		}
-		time.Sleep(olt.gMsg.BlockInterval)
+		time.Sleep(bct.gMsg.BlockInterval)
 	}
 	require.NotEqual(t, 10, i, "didn't include new values in time")
 
@@ -134,83 +134,82 @@ func TestContractStruct_Update(t *testing.T) {
 		}},
 	}
 
-	cs.Update(ol.Arguments{{
+	cs.Update(byzcoin.Arguments{{
 		Name:  "one",
 		Value: []byte{2},
 	}})
 	require.Equal(t, 1, len(cs.Storage))
 	require.Equal(t, []byte{2}, cs.Storage[0].Value)
 
-	cs.Update(ol.Arguments{{
+	cs.Update(byzcoin.Arguments{{
 		Name:  "one",
 		Value: nil,
 	}})
 	require.Equal(t, 0, len(cs.Storage))
 
-	cs.Update(ol.Arguments{{
+	cs.Update(byzcoin.Arguments{{
 		Name:  "two",
 		Value: []byte{22},
 	}})
 	require.Equal(t, 1, len(cs.Storage))
 	require.Equal(t, []byte{22}, cs.Storage[0].Value)
 
-	cs.Update(ol.Arguments{{
+	cs.Update(byzcoin.Arguments{{
 		Name:  "two",
 		Value: []byte{},
 	}})
 	require.Equal(t, 0, len(cs.Storage))
 }
 
-// olTest is used here to provide some simple test structure for different
-// omniledger tests.
-type olTest struct {
+// bcTest is used here to provide some simple test structure for different
+// tests.
+type bcTest struct {
 	local   *onet.LocalTest
 	signer  darc.Signer
 	servers []*onet.Server
 	roster  *onet.Roster
-	cl      *ol.Client
-	gMsg    *ol.CreateGenesisBlock
+	cl      *byzcoin.Client
+	gMsg    *byzcoin.CreateGenesisBlock
 	gDarc   *darc.Darc
 }
 
-func newOLTest(t *testing.T) (olt *olTest) {
-	olt = &olTest{}
+func newBCTest(t *testing.T) (out *bcTest) {
+	out = &bcTest{}
 	// First create a local test environment with three nodes.
-	olt.local = onet.NewTCPTest(cothority.Suite)
+	out.local = onet.NewTCPTest(cothority.Suite)
 
-	olt.signer = darc.NewSignerEd25519(nil, nil)
-	olt.servers, olt.roster, _ = olt.local.GenTree(3, true)
-	olt.cl = ol.NewClient()
+	out.signer = darc.NewSignerEd25519(nil, nil)
+	out.servers, out.roster, _ = out.local.GenTree(3, true)
 
-	// Then create a new omniledger with the genesis darc having the right
+	// Then create a new ledger with the genesis darc having the right
 	// to create and update keyValue contracts.
 	var err error
-	olt.gMsg, err = ol.DefaultGenesisMsg(ol.CurrentVersion, olt.roster,
-		[]string{"spawn:keyValue", "spawn:darc", "invoke:update"}, olt.signer.Identity())
+	out.gMsg, err = byzcoin.DefaultGenesisMsg(byzcoin.CurrentVersion, out.roster,
+		[]string{"spawn:keyValue", "spawn:darc", "invoke:update"}, out.signer.Identity())
 	require.Nil(t, err)
-	olt.gDarc = &olt.gMsg.GenesisDarc
+	out.gDarc = &out.gMsg.GenesisDarc
 
 	// This BlockInterval is good for testing, but in real world applications this
 	// should be more like 5 seconds.
-	olt.gMsg.BlockInterval = time.Second / 2
+	out.gMsg.BlockInterval = time.Second / 2
 
-	_, err = olt.cl.CreateGenesisBlock(olt.gMsg)
+	out.cl, _, err = byzcoin.NewLedger(out.gMsg, false)
 	require.Nil(t, err)
-	return olt
+	return out
 }
 
-func (olt *olTest) Close() {
-	olt.local.CloseAll()
+func (bct *bcTest) Close() {
+	bct.local.CloseAll()
 }
 
-func (olt *olTest) createInstance(t *testing.T, args ol.Arguments) ol.InstanceID {
-	ctx := ol.ClientTransaction{
-		Instructions: []ol.Instruction{{
-			InstanceID: ol.NewInstanceID(olt.gDarc.GetBaseID()),
-			Nonce:      ol.Nonce{},
+func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.InstanceID {
+	ctx := byzcoin.ClientTransaction{
+		Instructions: []byzcoin.Instruction{{
+			InstanceID: byzcoin.NewInstanceID(bct.gDarc.GetBaseID()),
+			Nonce:      byzcoin.Nonce{},
 			Index:      0,
 			Length:     1,
-			Spawn: &ol.Spawn{
+			Spawn: &byzcoin.Spawn{
 				ContractID: ContractKeyValueID,
 				Args:       args,
 			},
@@ -218,24 +217,24 @@ func (olt *olTest) createInstance(t *testing.T, args ol.Arguments) ol.InstanceID
 	}
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.Nil(t, ctx.Instructions[0].SignBy(olt.gDarc.GetBaseID(), olt.signer))
+	require.Nil(t, ctx.Instructions[0].SignBy(bct.gDarc.GetBaseID(), bct.signer))
 
-	// Sending this transaction to OmniLedger does not directly include it in the
+	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
 	var err error
-	_, err = olt.cl.AddTransaction(ctx)
+	_, err = bct.cl.AddTransaction(ctx)
 	require.Nil(t, err)
 	return ctx.Instructions[0].DeriveID("")
 }
 
-func (olt *olTest) updateInstance(t *testing.T, instID ol.InstanceID, args ol.Arguments) {
-	ctx := ol.ClientTransaction{
-		Instructions: []ol.Instruction{{
+func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args byzcoin.Arguments) {
+	ctx := byzcoin.ClientTransaction{
+		Instructions: []byzcoin.Instruction{{
 			InstanceID: instID,
-			Nonce:      ol.Nonce{},
+			Nonce:      byzcoin.Nonce{},
 			Index:      0,
 			Length:     1,
-			Invoke: &ol.Invoke{
+			Invoke: &byzcoin.Invoke{
 				Command: "update",
 				Args:    args,
 			},
@@ -243,11 +242,11 @@ func (olt *olTest) updateInstance(t *testing.T, instID ol.InstanceID, args ol.Ar
 	}
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.Nil(t, ctx.Instructions[0].SignBy(olt.gDarc.GetBaseID(), olt.signer))
+	require.Nil(t, ctx.Instructions[0].SignBy(bct.gDarc.GetBaseID(), bct.signer))
 
-	// Sending this transaction to OmniLedger does not directly include it in the
+	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
 	var err error
-	_, err = olt.cl.AddTransaction(ctx)
+	_, err = bct.cl.AddTransaction(ctx)
 	require.Nil(t, err)
 }

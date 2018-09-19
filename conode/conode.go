@@ -23,7 +23,7 @@ import (
 	cli "gopkg.in/urfave/cli.v1"
 
 	// Import your service:
-	_ "github.com/dedis/cothority_template/omniledger"
+	_ "github.com/dedis/cothority_template/byzcoin"
 	_ "github.com/dedis/cothority_template/service"
 	// Here you can import any other needed service for your conode.
 	// For example, if your service needs cosi available in the server
