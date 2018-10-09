@@ -1,6 +1,6 @@
 package ch.epfl.dedis.template;
 
-import ch.epfl.dedis.lib.byzcoin.Instance;
+import ch.epfl.dedis.byzcoin.Instance;
 import ch.epfl.dedis.template.proto.KeyValueProto;
 import com.google.protobuf.InvalidProtocolBufferException;
 

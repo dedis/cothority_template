@@ -1,6 +1,6 @@
 package ch.epfl.dedis.integration;
 
-import ch.epfl.dedis.byzgen.OcsFactory;
+import ch.epfl.dedis.byzgen.CalypsoFactory;
 import ch.epfl.dedis.lib.Roster;
 import ch.epfl.dedis.lib.ServerIdentity;
 
@@ -23,16 +23,12 @@ public abstract class TestServerController {
 
     public abstract void killConode(int nodeNumber) throws IOException, InterruptedException;
 
-    public abstract List<OcsFactory.ConodeAddress> getConodes();
+    public abstract List<CalypsoFactory.ConodeAddress> getConodes();
 
     public Roster getRoster() {
         return new Roster(getConodes().stream()
                 .map(conodeAddress -> new ServerIdentity(conodeAddress.getAddress(), conodeAddress.getPublicKey()))
                 .collect(Collectors.toList()));
-    }
-
-    public OcsFactory.ConodeAddress getMasterConode() {
-        return getConodes().get(0);
     }
 
     @Nonnull

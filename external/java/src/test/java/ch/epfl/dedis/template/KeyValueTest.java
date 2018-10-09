@@ -4,15 +4,15 @@ import ch.epfl.dedis.integration.TestServerController;
 import ch.epfl.dedis.integration.TestServerInit;
 import ch.epfl.dedis.lib.Roster;
 import ch.epfl.dedis.lib.SkipblockId;
-import ch.epfl.dedis.lib.byzcoin.ByzCoinRPC;
+import ch.epfl.dedis.byzcoin.ByzCoinRPC;
 import ch.epfl.dedis.lib.exception.CothorityCommunicationException;
 import ch.epfl.dedis.lib.exception.CothorityException;
-import ch.epfl.dedis.lib.byzcoin.InstanceId;
-import ch.epfl.dedis.lib.byzcoin.contracts.DarcInstance;
-import ch.epfl.dedis.lib.byzcoin.darc.Darc;
-import ch.epfl.dedis.lib.byzcoin.darc.Rules;
-import ch.epfl.dedis.lib.byzcoin.darc.Signer;
-import ch.epfl.dedis.lib.byzcoin.darc.SignerEd25519;
+import ch.epfl.dedis.byzcoin.InstanceId;
+import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
+import ch.epfl.dedis.lib.darc.Darc;
+import ch.epfl.dedis.lib.darc.Rules;
+import ch.epfl.dedis.lib.darc.Signer;
+import ch.epfl.dedis.lib.darc.SignerEd25519;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ public class KeyValueTest {
         admin = new SignerEd25519();
         Rules rules = Darc.initRules(Arrays.asList(admin.getIdentity()),
                 Arrays.asList(admin.getIdentity()));
-        genesisDarc = new Darc(rules, "genesis".getBytes());
+        genesisDarc = ByzCoinRPC.makeGenesisDarc(admin, testInstanceController.getRoster());
 
         bc = new ByzCoinRPC(testInstanceController.getRoster(), genesisDarc, Duration.of(500, MILLIS));
         if (!bc.checkLiveness()) {
@@ -58,11 +58,11 @@ public class KeyValueTest {
 
         // Show how to evolve a darc to add new rules. We could've also create a correct genesis darc in the
         // lines above by adding all rules. But for testing purposes this shows how to add new rules to a darc.
-        genesisDarcInstance = new DarcInstance(bc, genesisDarc);
+        genesisDarcInstance = DarcInstance.fromByzCoin(bc, genesisDarc);
         Darc darc2 = genesisDarc.copy();
         darc2.setRule("spawn:keyValue", admin.getIdentity().toString().getBytes());
         darc2.setRule("invoke:update", admin.getIdentity().toString().getBytes());
-        genesisDarcInstance.evolveDarcAndWait(darc2, admin);
+        genesisDarcInstance.evolveDarcAndWait(darc2, admin, 2);
     }
 
     /**
@@ -106,7 +106,7 @@ public class KeyValueTest {
         KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, Arrays.asList(mKV));
         assertEquals(mKV, vi.getKeyValues().get(0));
 
-        reconnect_client(bc.getRoster(), bc.getGenesis().getSkipchainId(), vi.getId());
+        reconnect_client(bc.getRoster(), bc.getGenesisBlock().getSkipchainId(), vi.getId());
     }
 
     /**
@@ -118,7 +118,7 @@ public class KeyValueTest {
      * @param kvId the Id of the instance to retrieve
      */
     void reconnect_client(Roster ro, SkipblockId scId, InstanceId kvId) throws CothorityException, InvalidProtocolBufferException {
-        ByzCoinRPC bc = new ByzCoinRPC(ro, scId);
+        ByzCoinRPC bc = ByzCoinRPC.fromByzCoin(ro, scId);
         assertTrue(bc.checkLiveness());
 
         KeyValueInstance localKvi = new KeyValueInstance(bc, kvId);
