@@ -177,7 +177,7 @@
         <dependency>
             <groupId>ch.epfl.dedis</groupId>
             <artifactId>cothority</artifactId>
-            <version>master-181008</version>
+            <version>master-181009</version>
         </dependency>
 
         <!-- dependencies required for compilation -->
