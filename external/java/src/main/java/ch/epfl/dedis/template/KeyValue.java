@@ -1,6 +1,6 @@
 package ch.epfl.dedis.template;
 
-import ch.epfl.dedis.lib.byzcoin.Argument;
+import ch.epfl.dedis.byzcoin.transaction.Argument;
 import ch.epfl.dedis.template.proto.KeyValueProto;
 
 import java.util.Arrays;

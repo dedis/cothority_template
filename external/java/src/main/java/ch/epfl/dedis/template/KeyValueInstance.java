@@ -1,14 +1,18 @@
 package ch.epfl.dedis.template;
 
-import ch.epfl.dedis.lib.crypto.Hex;
+import ch.epfl.dedis.byzcoin.transaction.Argument;
+import ch.epfl.dedis.byzcoin.transaction.ClientTransaction;
+import ch.epfl.dedis.byzcoin.transaction.Instruction;
+import ch.epfl.dedis.byzcoin.transaction.Invoke;
+import ch.epfl.dedis.lib.Hex;
 import ch.epfl.dedis.lib.exception.CothorityCryptoException;
 import ch.epfl.dedis.lib.exception.CothorityException;
 import ch.epfl.dedis.lib.exception.CothorityNotFoundException;
-import ch.epfl.dedis.lib.byzcoin.*;
-import ch.epfl.dedis.lib.byzcoin.contracts.DarcInstance;
-import ch.epfl.dedis.lib.byzcoin.darc.Request;
-import ch.epfl.dedis.lib.byzcoin.darc.Signature;
-import ch.epfl.dedis.lib.byzcoin.darc.Signer;
+import ch.epfl.dedis.byzcoin.*;
+import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
+import ch.epfl.dedis.lib.darc.Request;
+import ch.epfl.dedis.lib.darc.Signature;
+import ch.epfl.dedis.lib.darc.Signer;
 import ch.epfl.dedis.template.proto.KeyValueProto;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.slf4j.Logger;
@@ -72,7 +76,7 @@ public class KeyValueInstance {
         for (KeyValue kv: kvs){
             args.add(kv.toArgument());
         }
-        Proof p = darcInstance.spawnContractAndWait("keyValue", signer, args, 10);
+        Proof p = darcInstance.spawnInstanceAndWait("keyValue", signer, args, 10);
         update(p);
     }
 
@@ -106,7 +110,7 @@ public class KeyValueInstance {
         if (!pr.matches()){
             throw new CothorityException("cannot use non-matching proof for update");
         }
-        instance = new Instance(pr);
+        instance = Instance.fromProof(pr);
         if (!instance.getContractId().equals("keyValue")) {
             logger.error("wrong instance: {}", instance.getContractId());
             throw new CothorityNotFoundException("this is not a keyValue instance");
