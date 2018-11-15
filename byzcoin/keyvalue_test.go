@@ -38,14 +38,14 @@ func TestKeyValue_Spawn(t *testing.T) {
 	pr, err := bct.cl.WaitProof(instID, bct.gMsg.BlockInterval, nil)
 	require.Nil(t, err)
 	// Make sure the proof is a matching proof and not a proof of absence.
-	require.True(t, pr.InclusionProof.Match())
+	require.True(t, pr.InclusionProof.Match(instID.Slice()))
 
 	// Get the raw values of the proof.
-	values, err := pr.InclusionProof.RawValues()
+	_, val, _, _, err := pr.KeyValue()
 	require.Nil(t, err)
-	// And decode the buffer to a ContractStruct.
+	// And decode the buffer to a KeyValueData
 	cs := KeyValueData{}
-	err = protobuf.Decode(values[0], &cs)
+	err = protobuf.Decode(val, &cs)
 	require.Nil(t, err)
 	// Verify all values are in there.
 	for i, s := range cs.Storage {
@@ -98,16 +98,16 @@ func TestKeyValue_Invoke(t *testing.T) {
 
 	// Wait for the new values to be written.
 	// Store the values of the previous proof in 'values'
-	_, values1, err := pr1.KeyValue()
+	_, v1, _, _, err := pr1.KeyValue()
 	require.Nil(t, err)
-	var values2 [][]byte
+	var v2 []byte
 	// Try 10 times to get other values than that from the ledger.
 	var i int
 	for i = 0; i < 10; i++ {
 		prRep2, err := bct.cl.GetProof(instID.Slice())
 		require.Nil(t, err)
-		_, values2, err = prRep2.Proof.KeyValue()
-		if bytes.Compare(values1[0], values2[0]) != 0 {
+		_, v2, _, _, err = prRep2.Proof.KeyValue()
+		if bytes.Compare(v1, v2) != 0 {
 			break
 		}
 		time.Sleep(bct.gMsg.BlockInterval)
@@ -116,7 +116,7 @@ func TestKeyValue_Invoke(t *testing.T) {
 
 	// Read the content of the instance back into a structure.
 	var newArgs KeyValueData
-	err = protobuf.Decode(values2[0], &newArgs)
+	err = protobuf.Decode(v2, &newArgs)
 	require.Nil(t, err)
 	// Verify the content is as it is supposed to be.
 	require.Equal(t, 2, len(newArgs.Storage))
@@ -171,6 +171,7 @@ type bcTest struct {
 	cl      *byzcoin.Client
 	gMsg    *byzcoin.CreateGenesisBlock
 	gDarc   *darc.Darc
+	ct      uint64
 }
 
 func newBCTest(t *testing.T) (out *bcTest) {
@@ -195,6 +196,8 @@ func newBCTest(t *testing.T) (out *bcTest) {
 
 	out.cl, _, err = byzcoin.NewLedger(out.gMsg, false)
 	require.Nil(t, err)
+	out.ct = 1
+
 	return out
 }
 
@@ -205,19 +208,18 @@ func (bct *bcTest) Close() {
 func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.InstanceID {
 	ctx := byzcoin.ClientTransaction{
 		Instructions: []byzcoin.Instruction{{
-			InstanceID: byzcoin.NewInstanceID(bct.gDarc.GetBaseID()),
-			Nonce:      byzcoin.Nonce{},
-			Index:      0,
-			Length:     1,
+			InstanceID:    byzcoin.NewInstanceID(bct.gDarc.GetBaseID()),
+			SignerCounter: []uint64{bct.ct},
 			Spawn: &byzcoin.Spawn{
 				ContractID: ContractKeyValueID,
 				Args:       args,
 			},
 		}},
 	}
+	bct.ct++
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.Nil(t, ctx.Instructions[0].SignBy(bct.gDarc.GetBaseID(), bct.signer))
+	require.NoError(t, ctx.SignWith(bct.signer))
 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
@@ -230,19 +232,18 @@ func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.
 func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args byzcoin.Arguments) {
 	ctx := byzcoin.ClientTransaction{
 		Instructions: []byzcoin.Instruction{{
-			InstanceID: instID,
-			Nonce:      byzcoin.Nonce{},
-			Index:      0,
-			Length:     1,
+			InstanceID:    instID,
+			SignerCounter: []uint64{bct.ct},
 			Invoke: &byzcoin.Invoke{
 				Command: "update",
 				Args:    args,
 			},
 		}},
 	}
+	bct.ct++
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.Nil(t, ctx.Instructions[0].SignBy(bct.gDarc.GetBaseID(), bct.signer))
+	require.NoError(t, ctx.SignWith(bct.signer))
 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.

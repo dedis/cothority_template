@@ -21,16 +21,16 @@ var ContractKeyValueID = "keyValue"
 // It can spawn new keyValue instances and will store all the arguments in
 // the data field.
 // Existing keyValue instances can be "update"d and deleted.
-func ContractKeyValue(cdb byzcoin.CollectionView, inst byzcoin.Instruction, cIn []byzcoin.Coin) (scs []byzcoin.StateChange, cOut []byzcoin.Coin, err error) {
+func ContractKeyValue(cdb byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruction, hash []byte, cIn []byzcoin.Coin) (scs []byzcoin.StateChange, cOut []byzcoin.Coin, err error) {
 	cOut = cIn
 
-	err = inst.VerifyDarcSignature(cdb)
+	err = inst.Verify(cdb, hash)
 	if err != nil {
 		return
 	}
 
 	var darcID darc.ID
-	_, _, darcID, err = cdb.GetValues(inst.InstanceID.Slice())
+	_, _, _, darcID, err = cdb.GetValues(inst.InstanceID.Slice())
 	if err != nil {
 		return
 	}
@@ -66,7 +66,7 @@ func ContractKeyValue(cdb byzcoin.CollectionView, inst byzcoin.Instruction, cIn 
 		//  2. update the data
 		//  3. encode the data into protobuf again
 		var csBuf []byte
-		csBuf, _, _, err = cdb.GetValues(inst.InstanceID.Slice())
+		csBuf, _, _, _, err = cdb.GetValues(inst.InstanceID.Slice())
 		cs := KeyValueData{}
 		err = protobuf.Decode(csBuf, &cs)
 		if err != nil {
