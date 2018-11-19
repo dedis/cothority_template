@@ -1,18 +1,18 @@
 package ch.epfl.dedis.template;
 
+import ch.epfl.dedis.byzcoin.ByzCoinRPC;
+import ch.epfl.dedis.byzcoin.InstanceId;
+import ch.epfl.dedis.byzcoin.SignerCounters;
+import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
 import ch.epfl.dedis.integration.TestServerController;
 import ch.epfl.dedis.integration.TestServerInit;
 import ch.epfl.dedis.lib.Roster;
 import ch.epfl.dedis.lib.SkipblockId;
-import ch.epfl.dedis.byzcoin.ByzCoinRPC;
-import ch.epfl.dedis.lib.exception.CothorityCommunicationException;
-import ch.epfl.dedis.lib.exception.CothorityException;
-import ch.epfl.dedis.byzcoin.InstanceId;
-import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
 import ch.epfl.dedis.lib.darc.Darc;
-import ch.epfl.dedis.lib.darc.Rules;
 import ch.epfl.dedis.lib.darc.Signer;
 import ch.epfl.dedis.lib.darc.SignerEd25519;
+import ch.epfl.dedis.lib.exception.CothorityCommunicationException;
+import ch.epfl.dedis.lib.exception.CothorityException;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,6 +31,7 @@ public class KeyValueTest {
     static ByzCoinRPC bc;
 
     static Signer admin;
+    static Long counter;
     static Darc genesisDarc;
     static DarcInstance genesisDarcInstance;
 
@@ -47,8 +49,6 @@ public class KeyValueTest {
     void initAll() throws Exception {
         testInstanceController = TestServerInit.getInstance();
         admin = new SignerEd25519();
-        Rules rules = Darc.initRules(Arrays.asList(admin.getIdentity()),
-                Arrays.asList(admin.getIdentity()));
         genesisDarc = ByzCoinRPC.makeGenesisDarc(admin, testInstanceController.getRoster());
 
         bc = new ByzCoinRPC(testInstanceController.getRoster(), genesisDarc, Duration.of(500, MILLIS));
@@ -56,13 +56,20 @@ public class KeyValueTest {
             throw new CothorityCommunicationException("liveness check failed");
         }
 
+        // Because we know that admin was just created, we do not really need to look up
+        // the current counter, we could just use "counter = (long)1;". But this is how
+        // you'd do it if you didn't know the counter.
+        SignerCounters counters = bc.getSignerCounters(Collections.singletonList(admin.getIdentity().toString()));
+        counter = counters.head()+1;
+
         // Show how to evolve a darc to add new rules. We could've also create a correct genesis darc in the
         // lines above by adding all rules. But for testing purposes this shows how to add new rules to a darc.
         genesisDarcInstance = DarcInstance.fromByzCoin(bc, genesisDarc);
-        Darc darc2 = genesisDarc.copy();
+        Darc darc2 = genesisDarc.copyRulesAndVersion();
         darc2.setRule("spawn:keyValue", admin.getIdentity().toString().getBytes());
         darc2.setRule("invoke:update", admin.getIdentity().toString().getBytes());
-        genesisDarcInstance.evolveDarcAndWait(darc2, admin, 2);
+        genesisDarcInstance.evolveDarcAndWait(darc2, admin, counter, 2);
+        counter++;
     }
 
     /**
@@ -87,11 +94,13 @@ public class KeyValueTest {
     void spawnValue() throws Exception {
         KeyValue mKV = new KeyValue("value", "314159".getBytes());
 
-        KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, Arrays.asList(mKV));
+        KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, counter, Arrays.asList(mKV));
+        counter++;
         assertEquals(mKV, vi.getKeyValues().get(0));
 
         mKV.setValue("27".getBytes());
-        vi.updateKeyValueAndWait(Arrays.asList(mKV), admin, 10);
+        vi.updateKeyValueAndWait(Arrays.asList(mKV), admin, counter, 10);
+        counter++;
 
         assertEquals(mKV, vi.getKeyValues().get(0));
     }
@@ -103,7 +112,8 @@ public class KeyValueTest {
     @Test
     void reconnect() throws Exception {
         KeyValue mKV = new KeyValue("value", "314159".getBytes());
-        KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, Arrays.asList(mKV));
+        KeyValueInstance vi = new KeyValueInstance(bc, genesisDarcInstance, admin, counter, Arrays.asList(mKV));
+        counter++;
         assertEquals(mKV, vi.getKeyValues().get(0));
 
         reconnect_client(bc.getRoster(), bc.getGenesisBlock().getSkipchainId(), vi.getId());

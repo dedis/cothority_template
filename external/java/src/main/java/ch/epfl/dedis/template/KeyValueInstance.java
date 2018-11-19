@@ -1,18 +1,21 @@
 package ch.epfl.dedis.template;
 
+import ch.epfl.dedis.byzcoin.ByzCoinRPC;
+import ch.epfl.dedis.byzcoin.Instance;
+import ch.epfl.dedis.byzcoin.InstanceId;
+import ch.epfl.dedis.byzcoin.Proof;
+import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
 import ch.epfl.dedis.byzcoin.transaction.Argument;
 import ch.epfl.dedis.byzcoin.transaction.ClientTransaction;
 import ch.epfl.dedis.byzcoin.transaction.Instruction;
 import ch.epfl.dedis.byzcoin.transaction.Invoke;
 import ch.epfl.dedis.lib.Hex;
-import ch.epfl.dedis.lib.exception.CothorityCryptoException;
-import ch.epfl.dedis.lib.exception.CothorityException;
-import ch.epfl.dedis.lib.exception.CothorityNotFoundException;
-import ch.epfl.dedis.byzcoin.*;
-import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
 import ch.epfl.dedis.lib.darc.Request;
 import ch.epfl.dedis.lib.darc.Signature;
 import ch.epfl.dedis.lib.darc.Signer;
+import ch.epfl.dedis.lib.exception.CothorityCryptoException;
+import ch.epfl.dedis.lib.exception.CothorityException;
+import ch.epfl.dedis.lib.exception.CothorityNotFoundException;
 import ch.epfl.dedis.template.proto.KeyValueProto;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -70,13 +74,13 @@ public class KeyValueInstance {
      * @param kvs a list of KeyValues to include in the data of the instance
      * @throws CothorityException
      */
-    public KeyValueInstance(ByzCoinRPC bc, DarcInstance darcInstance, Signer signer, List<KeyValue> kvs) throws CothorityException{
+    public KeyValueInstance(ByzCoinRPC bc, DarcInstance darcInstance, Signer signer, Long ctr, List<KeyValue> kvs) throws CothorityException{
         this.bc = bc;
         List<Argument> args = new ArrayList<>();
         for (KeyValue kv: kvs){
             args.add(kv.toArgument());
         }
-        Proof p = darcInstance.spawnInstanceAndWait("keyValue", signer, args, 10);
+        Proof p = darcInstance.spawnInstanceAndWait("keyValue", signer, ctr, args, 10);
         update(p);
     }
 
@@ -131,18 +135,16 @@ public class KeyValueInstance {
      *
      * @param keyValues the keyValues to replace/delete/add to the list.
      * @param owner     must have its identity in the "invoke:update" rule
-     * @param pos       position of the instruction in the ClientTransaction
-     * @param len       total number of instructions in the ClientTransaction
      * @return Instruction to be sent to ByzCoin
      * @throws CothorityCryptoException
      */
-    public Instruction updateKeyValueInstruction(List<KeyValue> keyValues, Signer owner, int pos, int len) throws CothorityCryptoException {
+    public Instruction updateKeyValueInstruction(List<KeyValue> keyValues, Signer owner, Long ctr) throws CothorityCryptoException {
         List<Argument> args = new ArrayList<>();
         for (KeyValue kv : keyValues) {
             args.add(new Argument(kv.getKey(), kv.getValue()));
         }
         Invoke inv = new Invoke("update", args);
-        Instruction inst = new Instruction(instance.getId(), Instruction.genNonce(), pos, len, inv);
+        Instruction inst = new Instruction(instance.getId(), Collections.singletonList(ctr), inv);
         try {
             Request r = new Request(instance.getDarcId(), "invoke:update", inst.hash(),
                     Arrays.asList(owner.getIdentity()), null);
@@ -163,8 +165,8 @@ public class KeyValueInstance {
      * @return a TransactionId pointing to the transaction that should be included
      * @throws CothorityException
      */
-    public void updateKeyValue(List<KeyValue> keyValues, Signer owner) throws CothorityException {
-        Instruction inst = updateKeyValueInstruction(keyValues, owner, 0, 1);
+    public void updateKeyValue(List<KeyValue> keyValues, Signer owner, Long ctr) throws CothorityException {
+        Instruction inst = updateKeyValueInstruction(keyValues, owner, ctr);
         ClientTransaction ct = new ClientTransaction(Arrays.asList(inst));
         bc.sendTransaction(ct);
     }
@@ -178,9 +180,10 @@ public class KeyValueInstance {
      * @param wait      is the number of blocks to wait for an inclusion
      * @throws CothorityException
      */
-    public void updateKeyValueAndWait(List<KeyValue> keyValues, Signer owner, int wait) throws CothorityException {
-        Instruction inst = updateKeyValueInstruction(keyValues, owner, 0, 1);
+    public void updateKeyValueAndWait(List<KeyValue> keyValues, Signer owner, Long ctr, int wait) throws CothorityException {
+        Instruction inst = updateKeyValueInstruction(keyValues, owner, ctr);
         ClientTransaction ct = new ClientTransaction(Arrays.asList(inst));
+        ct.signWith(Collections.singletonList(owner));
         bc.sendTransactionAndWait(ct, wait);
         update();
     }
