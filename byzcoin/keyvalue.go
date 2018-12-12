@@ -16,92 +16,97 @@ import (
 // key/value pairs.
 var ContractKeyValueID = "keyValue"
 
+type contractValue struct {
+	byzcoin.BasicContract
+	KeyValueData
+}
+
+func contractValueFromBytes(in []byte) (byzcoin.Contract, error) {
+	cv := &contractValue{}
+	err := protobuf.Decode(in, &cv.KeyValueData)
+	if err != nil {
+		return nil, err
+	}
+	return cv, nil
+}
+
 // ContractKeyValue is a simple key/value storage where you
 // can put any data inside as wished.
 // It can spawn new keyValue instances and will store all the arguments in
 // the data field.
 // Existing keyValue instances can be "update"d and deleted.
-func ContractKeyValue(cdb byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruction, hash []byte, cIn []byzcoin.Coin) (scs []byzcoin.StateChange, cOut []byzcoin.Coin, err error) {
-	cOut = cIn
-
-	err = inst.Verify(cdb, hash)
-	if err != nil {
-		return
-	}
+func (c *contractValue) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruction, coins []byzcoin.Coin) (sc []byzcoin.StateChange, cout []byzcoin.Coin, err error) {
+	cout = coins
 
 	var darcID darc.ID
-	_, _, _, darcID, err = cdb.GetValues(inst.InstanceID.Slice())
+	_, _, _, darcID, err = rst.GetValues(inst.InstanceID.Slice())
 	if err != nil {
 		return
 	}
 
-	switch inst.GetType() {
-	case byzcoin.SpawnType:
-		// Spawn a new instance of the KeyValue contract.
-		// First create a new ContractStruct and encode it as a protobuf.
-		cs := NewContractStruct(inst.Spawn.Args)
-		var csBuf []byte
-		csBuf, err = protobuf.Encode(&cs)
-		if err != nil {
-			return
-		}
+	// Put the stuff from the inst.Spawn.Args into our KeyValueData structure.
+	cs := &c.KeyValueData
+	for _, kv := range inst.Spawn.Args {
+		cs.Storage = append(cs.Storage, KeyValue{kv.Name, kv.Value})
+	}
 
-		instID := inst.DeriveID("")
-		// Then create a StateChange request with the data of the instance. The
-		// InstanceID is given by the DeriveID method of the instruction that allows
-		// to create multiple instanceIDs out of a given instruction in a pseudo-
-		// random way that will be the same for all nodes.
-		scs = []byzcoin.StateChange{
-			byzcoin.NewStateChange(byzcoin.Create, instID, ContractKeyValueID, csBuf, darcID),
-		}
-		return
-
-	case byzcoin.InvokeType:
-		if inst.Invoke.Command != "update" {
-			return nil, nil, errors.New("Value contract can only update")
-		}
-		// The only command we can invoke is 'update' which will store the new values
-		// given in the arguments in the data.
-		//  1. decode the existing data
-		//  2. update the data
-		//  3. encode the data into protobuf again
-		var csBuf []byte
-		csBuf, _, _, _, err = cdb.GetValues(inst.InstanceID.Slice())
-		cs := KeyValueData{}
-		err = protobuf.Decode(csBuf, &cs)
-		if err != nil {
-			return
-		}
-		cs.Update(inst.Invoke.Args)
-		csBuf, err = protobuf.Encode(&cs)
-		if err != nil {
-			return
-		}
-		scs = []byzcoin.StateChange{
-			byzcoin.NewStateChange(byzcoin.Update, inst.InstanceID,
-				ContractKeyValueID, csBuf, darcID),
-		}
-		return
-
-	case byzcoin.DeleteType:
-		// Delete removes all the data from the global state.
-		scs = byzcoin.StateChanges{
-			byzcoin.NewStateChange(byzcoin.Remove, inst.InstanceID, ContractKeyValueID, nil, darcID),
-		}
+	csBuf, err := protobuf.Encode(&c.KeyValueData)
+	if err != nil {
 		return
 	}
-	err = errors.New("didn't find any instruction")
+
+	// Then create a StateChange request with the data of the instance. The
+	// InstanceID is given by the DeriveID method of the instruction that allows
+	// to create multiple instanceIDs out of a given instruction in a pseudo-
+	// random way that will be the same for all nodes.
+	sc = []byzcoin.StateChange{
+		byzcoin.NewStateChange(byzcoin.Create, inst.DeriveID(""), ContractKeyValueID, csBuf, darcID),
+	}
 	return
 }
 
-// NewContractStruct returns an initialised ContractStruct with all key/value
-// pairs from the arguments.
-func NewContractStruct(args byzcoin.Arguments) KeyValueData {
-	cs := KeyValueData{}
-	for _, kv := range args {
-		cs.Storage = append(cs.Storage, KeyValue{kv.Name, kv.Value})
+func (c *contractValue) Invoke(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruction, coins []byzcoin.Coin) (sc []byzcoin.StateChange, cout []byzcoin.Coin, err error) {
+	cout = coins
+	var darcID darc.ID
+	_, _, _, darcID, err = rst.GetValues(inst.InstanceID.Slice())
+	if err != nil {
+		return
 	}
-	return cs
+
+	if inst.Invoke.Command != "update" {
+		return nil, nil, errors.New("Value contract can only update")
+	}
+	// The only command we can invoke is 'update' which will store the new values
+	// given in the arguments in the data.
+	//  1. decode the existing data
+	//  2. update the data
+	//  3. encode the data into protobuf again
+
+	kvd := &c.KeyValueData
+	kvd.Update(inst.Invoke.Args)
+	var buf []byte
+	buf, err = protobuf.Encode(kvd)
+	if err != nil {
+		return
+	}
+	sc = []byzcoin.StateChange{
+		byzcoin.NewStateChange(byzcoin.Update, inst.InstanceID,
+			ContractKeyValueID, buf, darcID),
+	}
+	return
+}
+
+func (c *contractValue) Delete(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruction, coins []byzcoin.Coin) (sc []byzcoin.StateChange, cout []byzcoin.Coin, err error) {
+	cout = coins
+	var darcID darc.ID
+	_, _, _, darcID, err = rst.GetValues(inst.InstanceID.Slice())
+	if err != nil {
+		return
+	}
+
+	// Delete removes all the data from the global state.
+	sc = byzcoin.StateChanges{byzcoin.NewStateChange(byzcoin.Remove, inst.InstanceID, ContractKeyValueID, nil, darcID)}
+	return
 }
 
 // Update goes through all the arguments and:
