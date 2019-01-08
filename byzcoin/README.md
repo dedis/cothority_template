@@ -1,5 +1,5 @@
 Navigation: [DEDIS](https://github.com/dedis/doc/tree/master/README.md) ::
-[../README.md](Cothority Template) ::
+[Cothority Template](../README.md) ::
 ByzCoin Example
 
 # ByzCoin Example
