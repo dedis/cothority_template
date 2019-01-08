@@ -25,13 +25,13 @@ docker_dev: clean Dockerfile-dev exe/conode.Linux.x86_64
 
 docker_setup:
 	mkdir -p $(DATA_DIR)
-	docker run -it --rm -p 6879-6880:6879-6880 --name $(CONTAINER) -v $(DATA_DIR):/conode_data \
+	docker run -it --rm -p 7770-7771:7770-7771 --name $(CONTAINER) -v $(DATA_DIR):/conode_data \
 	    $(IMAGE_NAME):$(VERSION) ./conode setup
 
 docker_run:
 	if [ ! -f conode_data/private.toml ]; then make docker_setup; fi
 	mkdir -p $(DATA_DIR)
-	docker run -it --rm -p 6879-6880:6879-6880 --name $(CONTAINER) -v $(DATA_DIR):/conode_data \
+	docker run -it --rm -p 7770-7771:7770-7771 --name $(CONTAINER) -v $(DATA_DIR):/conode_data \
 	    $(IMAGE_NAME):$(VERSION)
 
 docker_stop:
