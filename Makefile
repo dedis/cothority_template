@@ -44,3 +44,4 @@ docker: conode/Dockerfile external/docker/Dockerfile
 
 test_java: docker
 	cd external/java; mvn test
+
