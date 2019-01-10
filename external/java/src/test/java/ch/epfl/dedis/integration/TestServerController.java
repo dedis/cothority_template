@@ -1,34 +1,67 @@
 package ch.epfl.dedis.integration;
 
-import ch.epfl.dedis.byzgen.CalypsoFactory;
-import ch.epfl.dedis.lib.Roster;
-import ch.epfl.dedis.lib.ServerIdentity;
+import ch.epfl.dedis.lib.exception.CothorityCommunicationException;
+import ch.epfl.dedis.lib.network.Roster;
+import ch.epfl.dedis.lib.network.ServerIdentity;
+import ch.epfl.dedis.lib.network.ServerToml;
+import ch.epfl.dedis.status.StatusRPC;
+import com.moandjiezana.toml.Toml;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class TestServerController {
-    protected static final String CONODE_PUB_1 = "d829a0790ffa8799e4bbd1bee8da0507c9166b665660baba72dd8610fca27cc1";
-    protected static final String CONODE_PUB_2 = "d750a30daa44713d1a4b44ca4ef31142b3b53c0c36a558c0d610cc4108bb4ecb";
-    protected static final String CONODE_PUB_3 = "7f47f33084c3ecc233f8b05b8f408bbd1c2e4a129aae126f92becacc73576bc7";
-    protected static final String CONODE_PUB_4 = "8b25f8ac70b85b2e9aa7faf65507d4f7555af1c872240305117b7659b1e58a1e";
+    private List<ServerIdentity> identities;
 
-    public abstract int countRunningConodes() throws IOException, InterruptedException;
+    public TestServerController() {
+        identities = new ArrayList<>();
+
+        try {
+            parseServerIdentities();
+        } catch (Exception e) {
+            System.out.println("Oops: ");
+            e.printStackTrace();
+        }
+    }
+
+    public List<ServerIdentity> getIdentities() {
+        return identities;
+    }
+
+    /**
+     * Counts the number of conodes that are running by making a status request to all nodes in the roster. Note that it
+     * will not include nodes that are not in the roster.
+     */
+    public int countRunningConodes() {
+        int failures = 0;
+        for (ServerIdentity sid : this.getRoster().getNodes()) {
+            try {
+                StatusRPC.getStatus(sid);
+            } catch (CothorityCommunicationException e) {
+                failures++;
+            }
+        }
+        return getRoster().getNodes().size() - failures;
+    }
 
     public abstract void startConode(int nodeNumber) throws InterruptedException, IOException;
 
     public abstract void killConode(int nodeNumber) throws IOException, InterruptedException;
 
-    public abstract List<CalypsoFactory.ConodeAddress> getConodes();
+    public abstract List<ServerIdentity> getConodes();
 
     public Roster getRoster() {
-        return new Roster(getConodes().stream()
-                .map(conodeAddress -> new ServerIdentity(conodeAddress.getAddress(), conodeAddress.getPublicKey()))
-                .collect(Collectors.toList()));
+        return new Roster(getConodes());
+    }
+
+    public ServerIdentity getMasterConode() {
+        return getConodes().get(0);
     }
 
     @Nonnull
@@ -36,7 +69,29 @@ public abstract class TestServerController {
         try {
             return new URI(str);
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Unable to setup test instance", e);
+            throw new IllegalStateException("Unable to setup test services", e);
+        }
+    }
+
+    /**
+     * Read the public.toml file in the test resources and create the server identities from it
+     * @throws IOException for file errors
+     * @throws URISyntaxException for conode address errors
+     */
+    private void parseServerIdentities() throws IOException, URISyntaxException {
+        ClassLoader loader = getClass().getClassLoader();
+        URL filepath = loader.getResource("public.toml");
+        if (filepath == null) {
+            throw new IOException("missing public.toml file in the test resources");
+        }
+
+        File file = new File(filepath.getFile());
+        Toml toml = new Toml().read(file);
+
+        for (Toml srvToml : toml.getTables("servers")) {
+            ServerToml srv = srvToml.to(ServerToml.class);
+
+            identities.add(new ServerIdentity(srv));
         }
     }
 }

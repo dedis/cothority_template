@@ -12,9 +12,5 @@ COPY co2/public.toml co2/public.toml
 COPY co3/public.toml co3/public.toml
 COPY co4/public.toml co4/public.toml
 
-# local - run this as a set of local nodes in the docker
-# 3 - number of nodes to run
-# 2 - debug-level: 0 - none .. 5 - a lot
-# -wait - don't return from script when all nodes are started
 RUN cp ./conode /usr/local/bin/
-CMD ["env", "GODEBUG=gctrace=0", "./run_conode.sh", "local",  "4", "2", "-wait", "-nobuild" ]
+CMD ["./run_nodes.sh", "-v",  "2", "-n", "4" ]

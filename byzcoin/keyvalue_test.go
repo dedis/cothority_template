@@ -34,10 +34,11 @@ func TestKeyValue_Spawn(t *testing.T) {
 	// And send it to the ledger.
 	instID := bct.createInstance(t, args)
 
-	// Wait for the proof to be available.
-	pr, err := bct.cl.WaitProof(instID, bct.gMsg.BlockInterval, nil)
+	// Get the proof from byzcoin
+	reply, err := bct.cl.GetProof(instID.Slice())
 	require.Nil(t, err)
 	// Make sure the proof is a matching proof and not a proof of absence.
+	pr := reply.Proof
 	require.True(t, pr.InclusionProof.Match(instID.Slice()))
 
 	// Get the raw values of the proof.
@@ -75,9 +76,10 @@ func TestKeyValue_Invoke(t *testing.T) {
 	// And send it to the ledger.
 	instID := bct.createInstance(t, args)
 
-	// Wait for the proof to be available.
-	pr1, err := bct.cl.WaitProof(instID, bct.gMsg.BlockInterval, nil)
+	// Get the proof from byzcoin
+	reply, err := bct.cl.GetProof(instID.Slice())
 	require.Nil(t, err)
+	pr1 := reply.Proof
 
 	// Delete the key "one", change "two" and add a "three"
 	args = byzcoin.Arguments{
@@ -96,23 +98,14 @@ func TestKeyValue_Invoke(t *testing.T) {
 	}
 	bct.updateInstance(t, instID, args)
 
-	// Wait for the new values to be written.
 	// Store the values of the previous proof in 'values'
 	_, v1, _, _, err := pr1.KeyValue()
 	require.Nil(t, err)
 	var v2 []byte
-	// Try 10 times to get other values than that from the ledger.
-	var i int
-	for i = 0; i < 10; i++ {
-		prRep2, err := bct.cl.GetProof(instID.Slice())
-		require.Nil(t, err)
-		_, v2, _, _, err = prRep2.Proof.KeyValue()
-		if bytes.Compare(v1, v2) != 0 {
-			break
-		}
-		time.Sleep(bct.gMsg.BlockInterval)
-	}
-	require.NotEqual(t, 10, i, "didn't include new values in time")
+	prRep2, err := bct.cl.GetProof(instID.Slice())
+	require.Nil(t, err)
+	_, v2, _, _, err = prRep2.Proof.KeyValue()
+	require.NotEqual(t, 0, bytes.Compare(v1, v2), "didn't include new values")
 
 	// Read the content of the instance back into a structure.
 	var newArgs KeyValueData
@@ -224,7 +217,7 @@ func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
 	var err error
-	_, err = bct.cl.AddTransaction(ctx)
+	_, err = bct.cl.AddTransactionAndWait(ctx, 5)
 	require.Nil(t, err)
 	return ctx.Instructions[0].DeriveID("")
 }
@@ -248,6 +241,6 @@ func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
 	var err error
-	_, err = bct.cl.AddTransaction(ctx)
+	_, err = bct.cl.AddTransactionAndWait(ctx, 5)
 	require.Nil(t, err)
 }

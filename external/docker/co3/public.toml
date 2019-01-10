@@ -1,4 +1,12 @@
 [[servers]]
-  Address = "tcp://127.0.0.1:7006"
-  Public = "7f47f33084c3ecc233f8b05b8f408bbd1c2e4a129aae126f92becacc73576bc7"
+  Address = "tls://localhost:7774"
+  Suite = "Ed25519"
+  Public = "a5da747cb279e9bd8ff9627889126bf985391121cc11a16b6a6f377874b213ab"
   Description = "Conode_3"
+  [servers.Services]
+    [servers.Services.ByzCoin]
+      Public = "5382cc1f7326515824dd4204a6fafcb7b4b96680d98837a6f9bac1dcbb69cec43ad7aa8c044719f9813b1126c3e7930bb1555aefc75463158176744a9165507a804d731d2e88ec9487f92cbfeaa5d76a6fd0f6b57a0bf0e91b6403d2aebd7cf33f69cf633d4b1eae0fb8af87c91354a61874183da69b14db23dcf2ccfe6084e3"
+      Suite = "bn256.adapter"
+    [servers.Services.Skipchain]
+      Public = "11a5eb57d633a3fdd24ca944f0a7998883ecdf439f6fecfefe3f36002099980c642e3b1d2d15427b1427e1ad0ebe64beecf8ea08518ddac5a3971b36b6e064b00d23e80de2039812b6a5d6de7930efaaa1430e80ba93caa5200ea2ec6d32289351797262e8a7cebb8b56c950643548c689da9487b7bd2120afa483171abcc586"
+      Suite = "bn256.adapter"
