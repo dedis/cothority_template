@@ -1,27 +1,16 @@
 package ch.epfl.dedis.integration;
 
-import ch.epfl.dedis.byzgen.CalypsoFactory;
+import ch.epfl.dedis.lib.network.ServerIdentity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 public class ManualTestServerController extends TestServerController {
-    @Override
-    public int countRunningConodes() throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec("pgrep conode");
-        int returnCode = p.waitFor();
-        if (returnCode != 0) {
-            throw new IllegalStateException("unable to count running conodes");
-        }
-        return countLines(inputStreamToString(p.getInputStream()));
-    }
-
     @Override
     public void startConode(int nodeNumber) throws InterruptedException, IOException {
         Runtime.getRuntime().exec("../scripts/start_4th_conode.sh");
@@ -43,12 +32,8 @@ public class ManualTestServerController extends TestServerController {
     }
 
     @Override
-    public List<CalypsoFactory.ConodeAddress> getConodes() {
-        return Arrays.asList(
-                new CalypsoFactory.ConodeAddress(buildURI("tcp://localhost:7002"), CONODE_PUB_1),
-                new CalypsoFactory.ConodeAddress(buildURI("tcp://localhost:7004"), CONODE_PUB_2),
-                new CalypsoFactory.ConodeAddress(buildURI("tcp://localhost:7006"), CONODE_PUB_3),
-                new CalypsoFactory.ConodeAddress(buildURI("tcp://localhost:7008"), CONODE_PUB_4));
+    public List<ServerIdentity> getConodes() {
+        return getIdentities().subList(0, 4);
     }
 
     private static int countLines(String str){
