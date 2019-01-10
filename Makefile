@@ -43,5 +43,7 @@ docker: conode/Dockerfile external/docker/Dockerfile
 	cd external/docker/; make docker_test
 
 test_java: docker
+	docker images
+	docker run -t -i dedis/conode_template-test
 	cd external/java; mvn test
 
