@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dedis/cothority"
-	"github.com/dedis/cothority/byzcoin"
-	"github.com/dedis/cothority/darc"
-	"github.com/dedis/onet"
-	"github.com/dedis/protobuf"
 	"github.com/stretchr/testify/require"
+	"go.dedis.ch/cothority/v3"
+	"go.dedis.ch/cothority/v3/byzcoin"
+	"go.dedis.ch/cothority/v3/darc"
+	"go.dedis.ch/onet/v3"
+	"go.dedis.ch/protobuf"
 )
 
 func TestKeyValue_Spawn(t *testing.T) {
@@ -179,7 +179,7 @@ func newBCTest(t *testing.T) (out *bcTest) {
 	// to create and update keyValue contracts.
 	var err error
 	out.gMsg, err = byzcoin.DefaultGenesisMsg(byzcoin.CurrentVersion, out.roster,
-		[]string{"spawn:keyValue", "spawn:darc", "invoke:update"}, out.signer.Identity())
+		[]string{"spawn:keyValue", "spawn:darc", "invoke:keyValue.update"}, out.signer.Identity())
 	require.Nil(t, err)
 	out.gDarc = &out.gMsg.GenesisDarc
 
@@ -228,8 +228,9 @@ func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args 
 			InstanceID:    instID,
 			SignerCounter: []uint64{bct.ct},
 			Invoke: &byzcoin.Invoke{
-				Command: "update",
-				Args:    args,
+				ContractID: ContractKeyValueID,
+				Command:    "update",
+				Args:       args,
 			},
 		}},
 	}

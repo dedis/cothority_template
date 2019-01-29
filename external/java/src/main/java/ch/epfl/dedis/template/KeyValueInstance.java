@@ -143,7 +143,7 @@ public class KeyValueInstance {
         for (KeyValue kv : keyValues) {
             args.add(new Argument(kv.getKey(), kv.getValue()));
         }
-        Invoke inv = new Invoke("update", args);
+        Invoke inv = new Invoke("keyValue", "update", args);
         Instruction inst = new Instruction(instance.getId(), Collections.singletonList(ctr), inv);
         try {
             Request r = new Request(instance.getDarcId(), "invoke:update", inst.hash(),
