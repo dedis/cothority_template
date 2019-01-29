@@ -65,9 +65,9 @@ public class KeyValueTest {
         // Show how to evolve a darc to add new rules. We could've also create a correct genesis darc in the
         // lines above by adding all rules. But for testing purposes this shows how to add new rules to a darc.
         genesisDarcInstance = DarcInstance.fromByzCoin(bc, genesisDarc);
-        Darc darc2 = genesisDarc.copyRulesAndVersion();
+        Darc darc2 = genesisDarc.partialCopy();
         darc2.setRule("spawn:keyValue", admin.getIdentity().toString().getBytes());
-        darc2.setRule("invoke:update", admin.getIdentity().toString().getBytes());
+        darc2.setRule("invoke:keyValue.update", admin.getIdentity().toString().getBytes());
         genesisDarcInstance.evolveDarcAndWait(darc2, admin, counter, 2);
         counter++;
     }
