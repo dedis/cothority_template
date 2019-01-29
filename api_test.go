@@ -8,9 +8,9 @@ import (
 	// We need to include the service so it is started.
 	"github.com/dedis/cothority_template"
 	_ "github.com/dedis/cothority_template/service"
-	"github.com/dedis/kyber/suites"
-	"github.com/dedis/onet"
-	"github.com/dedis/onet/log"
+	"go.dedis.ch/kyber/v3/suites"
+	"go.dedis.ch/onet/v3"
+	"go.dedis.ch/onet/v3/log"
 )
 
 var tSuite = suites.MustFind("Ed25519")

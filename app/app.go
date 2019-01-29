@@ -10,9 +10,9 @@ import (
 
 	template "github.com/dedis/cothority_template"
 
-	"github.com/dedis/onet/app"
+	"go.dedis.ch/onet/v3/app"
 
-	"github.com/dedis/onet/log"
+	"go.dedis.ch/onet/v3/log"
 	"gopkg.in/urfave/cli.v1"
 )
 
