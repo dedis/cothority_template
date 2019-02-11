@@ -179,7 +179,7 @@ func newBCTest(t *testing.T) (out *bcTest) {
 	// to create and update keyValue contracts.
 	var err error
 	out.gMsg, err = byzcoin.DefaultGenesisMsg(byzcoin.CurrentVersion, out.roster,
-		[]string{"spawn:keyValue", "spawn:darc", "invoke:keyValue.update"}, out.signer.Identity())
+		[]string{"spawn:keyValue", "invoke:keyValue.update"}, out.signer.Identity())
 	require.Nil(t, err)
 	out.gDarc = &out.gMsg.GenesisDarc
 
@@ -212,7 +212,7 @@ func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.
 	bct.ct++
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.NoError(t, ctx.SignWith(bct.signer))
+	require.NoError(t, ctx.FillSignersAndSignWith(bct.signer))
 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
@@ -237,7 +237,7 @@ func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args 
 	bct.ct++
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
-	require.NoError(t, ctx.SignWith(bct.signer))
+	require.NoError(t, ctx.FillSignersAndSignWith(bct.signer))
 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
