@@ -4,14 +4,13 @@ import ch.epfl.dedis.byzcoin.ByzCoinRPC;
 import ch.epfl.dedis.byzcoin.Instance;
 import ch.epfl.dedis.byzcoin.InstanceId;
 import ch.epfl.dedis.byzcoin.Proof;
-import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
+import ch.epfl.dedis.byzcoin.contracts.SecureDarcInstance;
 import ch.epfl.dedis.byzcoin.transaction.Argument;
 import ch.epfl.dedis.byzcoin.transaction.ClientTransaction;
 import ch.epfl.dedis.byzcoin.transaction.Instruction;
 import ch.epfl.dedis.byzcoin.transaction.Invoke;
 import ch.epfl.dedis.lib.Hex;
 import ch.epfl.dedis.lib.darc.Request;
-import ch.epfl.dedis.lib.darc.Signature;
 import ch.epfl.dedis.lib.darc.Signer;
 import ch.epfl.dedis.lib.exception.CothorityCryptoException;
 import ch.epfl.dedis.lib.exception.CothorityException;
@@ -74,7 +73,7 @@ public class KeyValueInstance {
      * @param kvs a list of KeyValues to include in the data of the instance
      * @throws CothorityException
      */
-    public KeyValueInstance(ByzCoinRPC bc, DarcInstance darcInstance, Signer signer, Long ctr, List<KeyValue> kvs) throws CothorityException{
+    public KeyValueInstance(ByzCoinRPC bc, SecureDarcInstance darcInstance, Signer signer, Long ctr, List<KeyValue> kvs) throws CothorityException{
         this.bc = bc;
         List<Argument> args = new ArrayList<>();
         for (KeyValue kv: kvs){
@@ -144,16 +143,12 @@ public class KeyValueInstance {
             args.add(new Argument(kv.getKey(), kv.getValue()));
         }
         Invoke inv = new Invoke("keyValue", "update", args);
-        Instruction inst = new Instruction(instance.getId(), Collections.singletonList(ctr), inv);
-        try {
-            Request r = new Request(instance.getDarcId(), "invoke:update", inst.hash(),
-                    Arrays.asList(owner.getIdentity()), null);
-            logger.info("Signing: {}", Hex.printHexBinary(r.hash()));
-            Signature sign = new Signature(owner.sign(r.hash()), owner.getIdentity());
-            inst.setSignatures(Arrays.asList(sign));
-        } catch (Signer.SignRequestRejectedException e) {
-            throw new CothorityCryptoException(e.getMessage());
-        }
+        Instruction inst = new Instruction(instance.getId(),
+                Collections.singletonList(owner.getIdentity()),
+                Collections.singletonList(ctr), inv);
+        Request r = new Request(instance.getDarcBaseID(), "invoke:update", inst.hash(),
+                Arrays.asList(owner.getIdentity()), null);
+        logger.info("Signing: {}", Hex.printHexBinary(r.hash()));
         return inst;
     }
 
@@ -168,6 +163,7 @@ public class KeyValueInstance {
     public void updateKeyValue(List<KeyValue> keyValues, Signer owner, Long ctr) throws CothorityException {
         Instruction inst = updateKeyValueInstruction(keyValues, owner, ctr);
         ClientTransaction ct = new ClientTransaction(Arrays.asList(inst));
+        ct.signWith(Collections.singletonList(owner));
         bc.sendTransaction(ct);
     }
 

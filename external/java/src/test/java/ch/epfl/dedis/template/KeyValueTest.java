@@ -3,7 +3,7 @@ package ch.epfl.dedis.template;
 import ch.epfl.dedis.byzcoin.ByzCoinRPC;
 import ch.epfl.dedis.byzcoin.InstanceId;
 import ch.epfl.dedis.byzcoin.SignerCounters;
-import ch.epfl.dedis.byzcoin.contracts.DarcInstance;
+import ch.epfl.dedis.byzcoin.contracts.SecureDarcInstance;
 import ch.epfl.dedis.integration.TestServerController;
 import ch.epfl.dedis.integration.TestServerInit;
 import ch.epfl.dedis.lib.SkipblockId;
@@ -33,7 +33,7 @@ public class KeyValueTest {
     static Signer admin;
     static Long counter;
     static Darc genesisDarc;
-    static DarcInstance genesisDarcInstance;
+    static SecureDarcInstance genesisDarcInstance;
 
     private final static Logger logger = LoggerFactory.getLogger(KeyValueTest.class);
     private TestServerController testInstanceController;
@@ -64,7 +64,7 @@ public class KeyValueTest {
 
         // Show how to evolve a darc to add new rules. We could've also create a correct genesis darc in the
         // lines above by adding all rules. But for testing purposes this shows how to add new rules to a darc.
-        genesisDarcInstance = DarcInstance.fromByzCoin(bc, genesisDarc);
+        genesisDarcInstance = SecureDarcInstance.fromByzCoin(bc, genesisDarc);
         Darc darc2 = genesisDarc.partialCopy();
         darc2.setRule("spawn:keyValue", admin.getIdentity().toString().getBytes());
         darc2.setRule("invoke:keyValue.update", admin.getIdentity().toString().getBytes());
