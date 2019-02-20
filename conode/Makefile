@@ -48,4 +48,4 @@ clean:
 # so that we can find the right one in the wrapper script.
 # This is in it's own rule because the Docker build needs it also.
 exe/conode.Linux.x86_64:
-	GOOS=linux GOARCH=amd64 go build $(flags) -o $@
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build $(flags) -o $@
