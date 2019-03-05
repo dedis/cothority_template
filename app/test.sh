@@ -4,13 +4,13 @@ DBG_TEST=1
 # Debug-level for app
 DBG_APP=2
 
-. $(go env GOPATH)/src/github.com/dedis/onet/app/libtest.sh
+. ../libtest.sh
 
 main(){
     startTest
-    buildConode
-    test Count
-    test Time
+    buildConode github.com/dedis/cothority_template/service
+    run testCount
+    run testTime
     stopTest
 }
 
