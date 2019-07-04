@@ -11,9 +11,10 @@ RUN mkdir /conode_data
 RUN mkdir -p .local/share .config
 RUN ln -s /conode_data .local/share/conode
 RUN ln -s /conode_data .config/conode
+COPY run_nodes.sh .
 COPY --from=builder /go/bin/conode .
 COPY --from=builder /go/bin/bcadmin /go/bin/el /go/bin/scmgr /usr/local/bin/
 
 EXPOSE 7770 7771
 
-CMD ["/root/conode", "-d", "2", "server"]
+CMD ["./run_nodes.sh", "-d", "/conode_data", "-v", "2"]
