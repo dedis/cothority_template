@@ -16,6 +16,7 @@ import (
 func TestKeyValue_Spawn(t *testing.T) {
 	// Create a new ledger and prepare for proper closing
 	bct := newBCTest(t)
+	bct.cl.UseNode(0)
 	defer bct.Close()
 
 	// Create a new instance with two key/values:
@@ -58,6 +59,7 @@ func TestKeyValue_Spawn(t *testing.T) {
 func TestKeyValue_Invoke(t *testing.T) {
 	// Create a new ledger and prepare for proper closing
 	bct := newBCTest(t)
+	bct.cl.UseNode(0)
 	defer bct.Close()
 
 	// Create a new instance with two key/values:
