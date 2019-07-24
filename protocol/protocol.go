@@ -13,11 +13,9 @@ node will only use the `Handle`-methods, and not call `Start` again.
 import (
 	"go.dedis.ch/onet/v3"
 	"go.dedis.ch/onet/v3/log"
-	"go.dedis.ch/onet/v3/network"
 )
 
 func init() {
-	network.RegisterMessages(Reply{}, Announce{})
 	_, err := onet.GlobalProtocolRegister(Name, NewProtocol)
 	if err != nil {
 		panic(err)
