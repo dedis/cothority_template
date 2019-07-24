@@ -21,7 +21,7 @@ import (
 var tSuite = suites.MustFind("Ed25519")
 
 func TestMain(m *testing.M) {
-	log.MainTest(m)
+	log.MainTest(m, 3)
 }
 
 // Tests a 2, 5 and 13-node system. It is good practice to test different
@@ -33,9 +33,12 @@ func TestNode(t *testing.T) {
 		_, _, tree := local.GenTree(nbrNodes, true)
 		log.Lvl3(tree.Dump())
 
-		pi, err := local.StartProtocol("Template", tree)
+		pi, err := local.CreateProtocol("Template", tree)
 		require.Nil(t, err)
+
 		protocol := pi.(*protocol.TemplateProtocol)
+		require.NoError(t, protocol.Start())
+
 		timeout := network.WaitRetry * time.Duration(network.MaxRetryConnect*nbrNodes*2) * time.Millisecond
 		select {
 		case children := <-protocol.ChildCount:
