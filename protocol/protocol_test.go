@@ -33,9 +33,12 @@ func TestNode(t *testing.T) {
 		_, _, tree := local.GenTree(nbrNodes, true)
 		log.Lvl3(tree.Dump())
 
-		pi, err := local.StartProtocol("Template", tree)
+		pi, err := local.CreateProtocol("Template", tree)
 		require.Nil(t, err)
+
 		protocol := pi.(*protocol.TemplateProtocol)
+		require.NoError(t, protocol.Start())
+
 		timeout := network.WaitRetry * time.Duration(network.MaxRetryConnect*nbrNodes*2) * time.Millisecond
 		select {
 		case children := <-protocol.ChildCount:

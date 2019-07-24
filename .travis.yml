@@ -6,7 +6,7 @@ matrix:
     - language: go
 
       go:
-        - 1.11.x
+        - 1.12.x
 
       install:
         - go get golang.org/x/tools/cmd/cover
@@ -20,8 +20,8 @@ matrix:
         - docker
 
       install:
-        - gimme 1.11
-        - . $HOME/.gimme/envs/go1.11.env
+        - gimme 1.12
+        - . $HOME/.gimme/envs/go1.12.env
         - env GO111MODULE=off go get github.com/dedis/Coding || true
 
       script:

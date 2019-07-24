@@ -8,20 +8,31 @@ In the this directory, you will find the implementation of a toy protocol where
 nodes work together to count how many instances of the protocol there are. It
 demonstrates how to send messages and how to handle incoming messages.
 
-To implement a new protocol, you must register the kinds of messages it passes,
-and also the protocol itself:
+To implement a new protocol, you must create the `NewProtocol` function and
+register it.
 
 ```go
 func init() {
-	network.RegisterMessage(Announce{})
-	network.RegisterMessage(Reply{})
-	onet.GlobalProtocolRegister(Name, NewProtocol)
+	_, err := onet.GlobalProtocolRegister(Name, NewProtocol)
+	if err != nil {
+		panic(err)
+	}
 }
 ```
 
-The messages are defined in the file `struct.go`. For each message, you need
-to define the message itself, and the message as it will arrive to you from the
-cothority server.
+## Writing `NewProtocol` - the protocol constructor
+
+Inside `NewProtocol` you must register the channels that are used for receiving
+messages, e.g., `announceChan chan announceWrapper`. Any state that is needed
+by the protocol (for example, the ChildCount channel) should be initialized
+here too.
+
+The messages are defined in the file `struct.go`. For each message, you need to
+define the message itself (e.g., `Announce`), and the message as it will arrive to
+you from the cothority server (e.g., `announceWrapper`).
+
+
+## Writing the protocol logic
 
 After registering, define a struct that implements the
 [onet.ProtocolInstance](https://godoc.org/github.com/dedis/onet#ProtocolInstance)
@@ -37,16 +48,9 @@ type TemplateProtocol struct {
 var _ onet.ProtocolInstance = (*TemplateProtocol)(nil)
 ```
 
-Next, define the function that generates a new protocol instance. Using the
-newly created `onet.ProtocolInstance`, you can call RegisterHandler in order to
-register handlers for each of the message types. Later, the server will choose
-the correct handler to call based on which message type arrives.
-
-Any state that is needed by the protocol (for example, the ChildCount channel)
-should be initialized here.
-
-Finally, define the `Start` function that will initiate the protocol instance:
-
-```go
-func (p *ProtocolExampleHandlers) Start() error {...}
-```
+Usually, an implementation for `Start` and `Dispatch` is needed, the others are
+optional and the default implementation will be used if they are not
+implemented. `Dispatch` is where the main protocol logic is implemented and it
+is called automatically by onet when the protocol is initiated. `Start` is the
+entry-point of the protocol, it needs to be called manually, typically by the
+root node.

@@ -11,17 +11,15 @@ node will only use the `Handle`-methods, and not call `Start` again.
 */
 
 import (
-	"errors"
-
 	"go.dedis.ch/onet/v3"
 	"go.dedis.ch/onet/v3/log"
-	"go.dedis.ch/onet/v3/network"
 )
 
 func init() {
-	network.RegisterMessage(Announce{})
-	network.RegisterMessage(Reply{})
-	onet.GlobalProtocolRegister(Name, NewProtocol)
+	_, err := onet.GlobalProtocolRegister(Name, NewProtocol)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // TemplateProtocol holds the state of a given protocol.
@@ -30,7 +28,9 @@ func init() {
 // of children. Only the root-node will write to the channel.
 type TemplateProtocol struct {
 	*onet.TreeNodeInstance
-	ChildCount chan int
+	announceChan chan announceWrapper
+	repliesChan  chan []replyWrapper
+	ChildCount   chan int
 }
 
 // Check that *TemplateProtocol implements onet.ProtocolInstance
@@ -42,50 +42,40 @@ func NewProtocol(n *onet.TreeNodeInstance) (onet.ProtocolInstance, error) {
 		TreeNodeInstance: n,
 		ChildCount:       make(chan int),
 	}
-	for _, handler := range []interface{}{t.HandleAnnounce, t.HandleReply} {
-		if err := t.RegisterHandler(handler); err != nil {
-			return nil, errors.New("couldn't register handler: " + err.Error())
-		}
+	if err := n.RegisterChannels(&t.announceChan, &t.repliesChan); err != nil {
+		return nil, err
 	}
 	return t, nil
 }
 
 // Start sends the Announce-message to all children
 func (p *TemplateProtocol) Start() error {
-	log.Lvl3("Starting TemplateProtocol")
-	return p.HandleAnnounce(StructAnnounce{p.TreeNode(),
-		Announce{"cothority rulez!"}})
+	log.Lvl3(p.ServerIdentity(), "Starting TemplateProtocol")
+	return p.SendTo(p.TreeNode(), &Announce{"cothority rulez!"})
 }
 
-// HandleAnnounce is the first message and is used to send an ID that
-// is stored in all nodes.
-func (p *TemplateProtocol) HandleAnnounce(msg StructAnnounce) error {
-	log.Lvl3("Parent announces:", msg.Message)
-	if !p.IsLeaf() {
-		// If we have children, send the same message to all of them
-		p.SendToChildren(&msg.Announce)
-	} else {
-		// If we're the leaf, start to reply
-		p.HandleReply(nil)
-	}
-	return nil
-}
-
-// HandleReply is the message going up the tree and holding a counter
-// to verify the number of nodes.
-func (p *TemplateProtocol) HandleReply(reply []StructReply) error {
+// Dispatch implements the main logic of the protocol. The function is only
+// called once. The protocol is considered finished when Dispatch returns and
+// Done is called.
+func (p *TemplateProtocol) Dispatch() error {
 	defer p.Done()
 
-	children := 1
-	for _, c := range reply {
-		children += c.ChildrenCount
+	ann := <-p.announceChan
+	if p.IsLeaf() {
+		return p.SendToParent(&Reply{1})
 	}
-	log.Lvl3(p.ServerIdentity().Address, "is done with total of", children)
+	p.SendToChildren(&ann.Announce)
+
+	replies := <-p.repliesChan
+	n := 1
+	for _, c := range replies {
+		n += c.ChildrenCount
+	}
+
 	if !p.IsRoot() {
-		log.Lvl3("Sending to parent")
-		return p.SendTo(p.Parent(), &Reply{children})
+		return p.SendToParent(&Reply{n})
 	}
-	log.Lvl3("Root-node is done - nbr of children found:", children)
-	p.ChildCount <- children
+
+	p.ChildCount <- n
 	return nil
 }
