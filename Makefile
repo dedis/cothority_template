@@ -16,7 +16,7 @@ test_fmt:
 test_lint:
 	@echo Checking linting of files
 	@{ \
-		go get -u github.com/golang/lint/golint; \
+		GO111MODULE=off go get -u golang.org/x/lint/golint; \
 		lintfiles=$$( golint ./... ); \
 		if [ -n "$$lintfiles" ]; then \
 		echo "Lint errors:"; \
