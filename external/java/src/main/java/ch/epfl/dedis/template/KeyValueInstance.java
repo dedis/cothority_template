@@ -162,7 +162,7 @@ public class KeyValueInstance {
      */
     public void updateKeyValue(List<KeyValue> keyValues, Signer owner, Long ctr) throws CothorityException {
         Instruction inst = updateKeyValueInstruction(keyValues, owner, ctr);
-        ClientTransaction ct = new ClientTransaction(Arrays.asList(inst));
+        ClientTransaction ct = new ClientTransaction(Arrays.asList(inst), bc.getProtocolVersion());
         ct.signWith(Collections.singletonList(owner));
         bc.sendTransaction(ct);
     }
@@ -178,7 +178,7 @@ public class KeyValueInstance {
      */
     public void updateKeyValueAndWait(List<KeyValue> keyValues, Signer owner, Long ctr, int wait) throws CothorityException {
         Instruction inst = updateKeyValueInstruction(keyValues, owner, ctr);
-        ClientTransaction ct = new ClientTransaction(Arrays.asList(inst));
+        ClientTransaction ct = new ClientTransaction(Arrays.asList(inst), bc.getProtocolVersion());
         ct.signWith(Collections.singletonList(owner));
         bc.sendTransactionAndWait(ct, wait);
         update();

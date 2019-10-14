@@ -201,16 +201,16 @@ func (bct *bcTest) Close() {
 }
 
 func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.InstanceID {
-	ctx := byzcoin.ClientTransaction{
-		Instructions: []byzcoin.Instruction{{
-			InstanceID:    byzcoin.NewInstanceID(bct.gDarc.GetBaseID()),
-			SignerCounter: []uint64{bct.ct},
-			Spawn: &byzcoin.Spawn{
-				ContractID: ContractKeyValueID,
-				Args:       args,
-			},
-		}},
-	}
+	ctx, err := bct.cl.CreateTransaction(byzcoin.Instruction{
+		InstanceID:    byzcoin.NewInstanceID(bct.gDarc.GetBaseID()),
+		SignerCounter: []uint64{bct.ct},
+		Spawn: &byzcoin.Spawn{
+			ContractID: ContractKeyValueID,
+			Args:       args,
+		},
+	})
+	require.NoError(t, err)
+
 	bct.ct++
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
@@ -218,24 +218,23 @@ func (bct *bcTest) createInstance(t *testing.T, args byzcoin.Arguments) byzcoin.
 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
-	var err error
 	_, err = bct.cl.AddTransactionAndWait(ctx, 5)
 	require.Nil(t, err)
 	return ctx.Instructions[0].DeriveID("")
 }
 
 func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args byzcoin.Arguments) {
-	ctx := byzcoin.ClientTransaction{
-		Instructions: []byzcoin.Instruction{{
-			InstanceID:    instID,
-			SignerCounter: []uint64{bct.ct},
-			Invoke: &byzcoin.Invoke{
-				ContractID: ContractKeyValueID,
-				Command:    "update",
-				Args:       args,
-			},
-		}},
-	}
+	ctx, err := bct.cl.CreateTransaction(byzcoin.Instruction{
+		InstanceID:    instID,
+		SignerCounter: []uint64{bct.ct},
+		Invoke: &byzcoin.Invoke{
+			ContractID: ContractKeyValueID,
+			Command:    "update",
+			Args:       args,
+		},
+	})
+	require.NoError(t, err)
+
 	bct.ct++
 	// And we need to sign the instruction with the signer that has his
 	// public key stored in the darc.
@@ -243,7 +242,6 @@ func (bct *bcTest) updateInstance(t *testing.T, instID byzcoin.InstanceID, args 
 
 	// Sending this transaction to ByzCoin does not directly include it in the
 	// global state - first we must wait for the new block to be created.
-	var err error
 	_, err = bct.cl.AddTransactionAndWait(ctx, 5)
 	require.Nil(t, err)
 }
