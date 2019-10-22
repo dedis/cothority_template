@@ -24,7 +24,7 @@ matrix:
         - make test_java
 
     - language: node_js
-    - node_js: "lts/*"
+      node_js: "lts/*"
 
       services:
         - docker
