@@ -23,6 +23,18 @@ matrix:
       script:
         - make test_java
 
+    - language: node_js
+
+      services:
+        - docker
+
+      install:
+        - gimme 1.13.1
+        - . $HOME/.gimme/envs/go1.13.1.env
+
+      script:
+        - make test_js
+
 cache:
   directories:
     - $HOME/.m2

@@ -44,3 +44,6 @@ docker:
 
 test_java: docker
 	cd external/java; mvn test
+
+test_js: docker
+	cd external/js; npm run test

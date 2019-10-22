@@ -347,7 +347,7 @@ class Handler {
         const rpc = Cothority.byzcoin.ByzCoinRPC.fromByzcoin(Handler.roster, Handler.scid)
         rpc.then(
             (r) => {
-                Handler.prependLog("RPC created, we now send a spawn request...")
+                Handler.prependLog("RPC created, we now send a spawn:keyValue request...")
                 KVInstance.spawn(r, Handler.darc.getBaseID(), [Handler.signer], keyStr, Buffer.from(valueStr)).then(
                     (kvInstance) => {
                         // Handler.prependLog("Key value instance spawned: " + kvInstance)
@@ -412,7 +412,7 @@ class Handler {
         const rpc = Cothority.byzcoin.ByzCoinRPC.fromByzcoin(Handler.roster, Handler.scid)
         rpc.then(
             (r) => {
-                Handler.prependLog("RPC created, we now send an invoke:update request...")
+                Handler.prependLog("RPC created, we now send an invoke:keyValue.update request...")
                 var buffValue = EMPTY_BUFFER
                 if (valueStr != "") buffValue = Buffer.from(valueStr)
                 KVInstance.fromByzcoin(r, instID).then(
