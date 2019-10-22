@@ -33,8 +33,10 @@ matrix:
         - . $HOME/.gimme/envs/go1.13.1.env
 
       script:
-        - pushd external/js && npm ci && npm run bundle && popd
-        - make test_js
+        - cd external/js
+        - npm ci
+        - npm run bundle
+        - npm run test
 
 cache:
   directories:
