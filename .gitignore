@@ -11,4 +11,5 @@ external/js/node_modules
 external/js/coverage
 external/js/.nyc_output
 external/js/dist
+external/js/output.log
 *.DS_Store

@@ -1,0 +1,165 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+
+        <link rel="stylesheet" href="assets/stylesheets/pure-min.css">
+        <link rel="stylesheet" href="assets/stylesheets/pure-grid-responsive-min.css">
+        <link rel="stylesheet" href="assets/stylesheets/base.css">
+
+        <script src="dist/bundle.min.js" type="text/javascript"></script>
+    </head>
+        <body>
+        <div class="pure-g main">
+            <div class="pure-u-1 pure-u-sm-1-2">
+                <div class="main-wrapper nice-scroll">
+                    <h1>external/js demo</h1>
+                    <p class="info">
+                        Hi.<br><br>
+                        In this demo we offers you to use the keyValue contract via the javascript librairy.<br>
+                        Follow the steps 🏃, look at the code 🔎, play arround with it 🤺, and have fun 🧸!
+                    </p>
+                    <div>
+                        <h3> 1: load the roster</h3>
+                        <p class="info">Load the <code>public.toml</code> file that is generated when you launch the <code>run_nodes.sh</code> script.</p>
+                        <div class="pure-form pure-form-stacked">
+                            <input id="rosterFile" onchange='' type="file" />
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 2: display the roster infos</h3>
+                        <p class="info">If the roster has been correctly loaded, you should be able to print the list of servers</p>
+                        <div class="pure-form pure-form-stacked">
+                            <button class="pure-button" onclick='jsapp.displayStatus()'>print roster status</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 3: set the darc</h3>
+                        <p class="info">This will fetch the genesis DARC and internally save it for the future requests</p>
+                        <div class="pure-form pure-form-stacked">
+                            Skip chain id: <input id="skipchainID" value="8b46622df9df1a89ce401147767c83c5130f8deaf20a0a1a58849e68e5bff268" />
+                            <button class="pure-button" onclick='jsapp.getDarc("skipchainID")'>get the genesis darc</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 4: load the signer</h3>
+                        <p class="info">
+                            Enter the private key of the signer. You can get the admin signer with the <code>bcadmin info</code> command.<br>
+                            The key should be saved next to the BC config file, with a name like the following: <code>key-ed25519:PUBKEY.cfg</code>.<br>
+                            You can then get the private key with the command <code>bcadmin key --print KEY_PATH</code>.
+                        </p>
+                        <div class="pure-form pure-form-stacked">
+                            Signer: <input id="signerID" value="bd457152388997809fa0a670401e1d55327eec7ee6dc434da3f4af1faef77801" />
+                            <button class="pure-button" onclick='jsapp.loadSigner("signerID")'>load the signer</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 5: add the rules on the DARC</h3>
+                        <p class="info">
+                            To use the keyValue contract, the DARC must have the following rules set:<br>
+                            - <code>spawn:keyValue</code><br>
+                            - <code>invoke:keyValue.update</code><br>
+                            Therefore, if the rules are not yet added, you can do it here by entering them one at a time.
+                        </p>
+                        <div class="pure-form pure-form-stacked">
+                            Rule: <input id="ruleID" />
+                            <button class="pure-button" onclick='jsapp.addRule("ruleID")'>add the rule</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 6: spawn a keyvalue instance</h3>
+                        <p class="info">You can finally create a new instance of the keyValue contract and initialize it with a key/value pair.
+                        <div class="pure-form pure-form-stacked">
+                            Key: <input id="keyID" /> Value: <input id="valueID" />
+                            <button class="pure-button" onclick='jsapp.spawnKV("keyID", "valueID")'>spawn key value</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 7: get the new keyvalue instance</h3>
+                        <p class="info">The instance ID is a uniq identifier of a smart contract's instance. 
+                        By entering the instance ID of the previously created keyValue instance, you display its content.
+                        <div class="pure-form pure-form-stacked">
+                            Instance ID: <input id="instID" />
+                            <button class="pure-button" onclick='jsapp.printKV("instID")'>print KV instance</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3> 8: add a key/value pair to the new keyvalue instance</h3>
+                        <p class="info">
+                            You can update the content of a keyValue instance by adding or removing a key.
+                            To remove an existing key, just fill the key input and leave the value input empty.<br>
+                            Note: The displayed result may not already contain the new key/value pair due to some delay.
+                        <div class="pure-form pure-form-stacked">
+                            Instance ID: <input id="instID2" /> Key: <input id="keyID2" /> Value: <input id="valueID2" />
+                            <button class="pure-button" onclick='jsapp.addKVpair("instID2","keyID2","valueID2")'>add key/value pair</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pure-u-1 pure-u-sm-1-2">
+                <div id="loader">
+                    <div>chargement... <img src="assets/images/loader.gif"></div>
+                </div>
+                <div id="status" class="nice-scroll"></div>
+            </div>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        window.onload = function() {
+            const input = document.getElementById('rosterFile');
+            input.addEventListener('change', jsapp.initRoster, false);
+        }
+    </script>
+    <style>
+        body, html {
+            overflow-y: hidden;   
+        }
+        div.main-wrapper {
+            max-height: 100vh;
+            overflow-y: scroll;
+            padding: 10px 20px;
+            box-sizing: border-box;
+        }
+        #status {
+            max-height: 100vh;
+            overflow-y: scroll;
+            position: relative;
+            padding: 20px 0;
+        }
+        #status > pre {
+            display: flex;
+            flex-direction: row;
+            padding: 10px;
+        }
+        #status > pre > div {
+            padding: 0 10px;
+        }
+        #status > pre > div p {
+            margin: 0 0 10px 0;
+        }
+        .info {
+            color: #666;
+        }
+        code {
+            display: inline-block;
+        }
+        div#loader {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            background: rgb(163, 255, 246);
+            box-shadow: 1px 1px 10px;
+            z-index: 10;
+            visibility: hidden;
+        }
+        div#loader.loading {
+            visibility: visible;
+        }
+    </style>
+</html>
