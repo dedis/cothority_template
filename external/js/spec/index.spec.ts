@@ -1,5 +1,5 @@
-import Docker from "dockerode";
 import { byzcoin } from "@dedis/cothority";
+import Docker from "dockerode";
 
 describe("Module import Tests", () => {
     it("should import the module", () => {
