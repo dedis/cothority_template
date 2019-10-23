@@ -12,6 +12,7 @@ matrix:
         - env GO111MODULE=on make test
 
     - language: java
+      name: "java test"
 
       services:
         - docker
@@ -24,7 +25,10 @@ matrix:
         - make test_java
 
     - language: node_js
+      name: "js test"
+
       node_js: "lts/*"
+      cache: npm
 
       services:
         - docker
@@ -37,7 +41,6 @@ matrix:
         - cd external/js
         - npm ci
         - npm run bundle
-        - npm run test
         - cd ../../
         - make test_js
 
