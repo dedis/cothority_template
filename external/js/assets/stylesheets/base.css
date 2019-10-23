@@ -23,6 +23,34 @@ div#footer {
 	background-color: rgb(131, 131, 131);
 }
 
+/* used horizontally with smaller height */
+.nice-scroll2::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 1px;
+	background-color: #F5F5F5;
+}
+
+.nice-scroll2::-webkit-scrollbar {
+	width: 9px;
+	height: 9px;
+	background-color: #F5F5F5;
+}
+
+.nice-scroll2::-webkit-scrollbar-thumb {
+	border-radius: 1px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: rgb(131, 131, 131);
+}
+
 * {
 	box-sizing: border-box;
+}
+
+body, html {
+	font-family: roboto,Helvetica,Arial,sans-serif;
+}
+
+pre, code {
+	font-family: roboto-mono,'Courier New', Courier, monospace;
+	font-size: 0.9em;
 }

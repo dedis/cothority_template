@@ -209,9 +209,12 @@ class Handler {
     }
 
     static prependLog(...nodes: (Node | string)[]) {
-        var wrapper = document.createElement("pre")
-        var contentWrapper = document.createElement("div")
+        var wrapper = document.createElement("div")
+        wrapper.classList.add("log-entry-wrapper")
+        var contentWrapper = document.createElement("pre")
+        contentWrapper.classList.add("nice-scroll2")
         var infos = document.createElement("div")
+        infos.classList.add("log-info")
         infos.append(Handler.logCounter + "")
         contentWrapper.append(...nodes)
         wrapper.append(infos, contentWrapper)
