@@ -15,15 +15,21 @@ ldflags=-s -w -X main.gitTag=$(TAG)
 
 all: docker
 
+.PHONY: docker-base
+docker-base: Dockerfile-base
+	docker build -t $(IMAGE_NAME)-base:latest -f Dockerfile-base .
+
 # Use this target to build from only published sources.
-docker: clean Dockerfile
+docker: clean Dockerfile docker-base
 	@[ -z "$(BUILD_TAG)" ] && echo "Must specify BUILD_TAG." && exit 1 || true
-	docker build -t $(IMAGE_NAME):$(BUILD_TAG) --build-arg BUILD_TAG="$(BUILD_TAG)" --build-arg ldflags="$(ldflags)" .
+	docker build -t $(IMAGE_NAME):$(BUILD_TAG) \
+		--build-arg BUILD_TAG="$(BUILD_TAG)" --build-arg ldflags="$(ldflags)" \
+		--build-arg FROM=$(IMAGE_NAME)-base:latest .
 	docker tag $(IMAGE_NAME):$(BUILD_TAG) $(IMAGE_NAME):dev
 
 # Use this target to build from local source instead of from publish sources.
-docker_dev: clean Dockerfile-dev verify exe/conode.Linux.x86_64
-	docker build -t $(IMAGE_NAME):$(TAG) -f Dockerfile-dev .
+docker_dev: clean Dockerfile-dev verify exe/conode.Linux.x86_64 docker-base
+	docker build -t $(IMAGE_NAME):$(TAG) -f Dockerfile-dev --build-arg FROM=$(IMAGE_NAME)-base:latest .
 	docker tag $(IMAGE_NAME):$(TAG) $(IMAGE_NAME):dev
 
 docker_push: docker
@@ -65,7 +71,10 @@ verify:
 exe/conode.Linux.x86_64:
 	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="$(ldflags)" -o $@
 
-bindist: clean verify exe/conode.Linux.x86_64
+builder:
+	@[ `uname` != Linux ] && echo "Release binary build server must be Linux." && exit 1 || true
+
+bindist: builder clean verify exe/conode.Linux.x86_64
 	rm -rf $(OUTPUT_DIR)
 	mkdir $(OUTPUT_DIR)
 	cp exe/conode.Linux.x86_64 $(OUTPUT_DIR)
@@ -78,3 +87,15 @@ bindist: clean verify exe/conode.Linux.x86_64
 	LANG=C tar zcf $(OUTPUT_DIR).tar.gz $(OUTPUT_DIR)
 	rm -rf $(OUTPUT_DIR)
 	ls -l $(OUTPUT_DIR).tar.gz
+
+tooldist: builder clean verify
+	rm -rf conode-tools-$(TAG)
+	mkdir conode-tools-$(TAG)
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="$(ldflags)" -o conode-tools-$(TAG)/bcadmin ../byzcoin/bcadmin
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="$(ldflags)" -o conode-tools-$(TAG)/status ../status
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="$(ldflags)" -o conode-tools-$(TAG)/scmgr ../scmgr
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="$(ldflags)" -o conode-tools-$(TAG)/evoting-admin ../evoting/evoting-admin
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="$(ldflags)" -o conode-tools-$(TAG)/csadmin ../calypso/csadmin
+	LANG=C tar zcf conode-tools-$(TAG).tar.gz conode-tools-$(TAG)
+	rm -rf conode-tools-$(TAG)
+	ls -l conode-tools-$(TAG).tar.gz

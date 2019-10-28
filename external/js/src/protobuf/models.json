@@ -1,0 +1,1 @@
+{"nested":{"cothority":{},"keyvalue":{"options":{"java_package":"ch.epfl.dedis.template.proto","java_outer_classname":"KeyValueProto"},"nested":{"KeyValue":{"fields":{"key":{"rule":"required","type":"string","id":1},"value":{"rule":"required","type":"bytes","id":2}}},"KeyValueData":{"fields":{"storage":{"rule":"repeated","type":"KeyValue","id":1,"options":{"packed":false}}}}}}}}

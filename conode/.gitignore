@@ -1,3 +1,2 @@
-exe
-public.toml
-co[123]
+conode_data
+exe/*

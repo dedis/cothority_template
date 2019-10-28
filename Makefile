@@ -38,9 +38,12 @@ proto:
 	./proto.sh
 	make -C external
 
-docker: conode/Dockerfile external/docker/Dockerfile
-	make -C conode docker_dev
-	make -C external/docker docker_test
+docker:
+	cd conode/; make docker_dev
+	cd external/docker; make docker_test
 
 test_java: docker
 	cd external/java; mvn test
+
+test_js: docker
+	cd external/js; npm run test

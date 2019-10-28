@@ -12,6 +12,7 @@ matrix:
         - env GO111MODULE=on make test
 
     - language: java
+      name: "java test"
 
       services:
         - docker
@@ -22,6 +23,26 @@ matrix:
 
       script:
         - make test_java
+
+    - language: node_js
+      name: "js test"
+
+      node_js: "lts/*"
+      cache: npm
+
+      services:
+        - docker
+
+      install:
+        - gimme 1.13.1
+        - . $HOME/.gimme/envs/go1.13.1.env
+
+      script:
+        - cd external/js
+        - npm ci
+        - npm run bundle
+        - cd ../../
+        - make test_js
 
 cache:
   directories:

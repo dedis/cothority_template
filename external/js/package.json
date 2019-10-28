@@ -1,0 +1,56 @@
+{
+  "name": "keyval",
+  "version": "1.0.0",
+  "description": "In this example, we are using `npm` as the package manager, `typescript` as the scripting language, `webpack` as the bundler, and `babel` as the ES6 transpiler.",
+  "main": "index.js",
+  "scripts": {
+    "bundle": "node node_modules/.bin/webpack",
+    "watch": "webpack --watch",
+    "test": "npm run linter && npm run cover",
+    "linter": "node_modules/.bin/tslint 'src/{,**/}*.ts' 'spec/{,**/}*.ts'",
+    "cover": "node_modules/.bin/nyc --reporter=lcov --reporter=text node_modules/jasmine/bin/jasmine.js",
+    "protobuf": "node scripts/build_proto.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@dedis/cothority": "^3.1.8-p1910.1607.3231.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@types/dockerode": "^2.5.20",
+    "@types/jasmine": "^3.4.4",
+    "@types/long": "^4.0.0",
+    "babel-loader": "^8.0.6",
+    "dockerode": "^3.0.2",
+    "jasmine": "^3.5.0",
+    "jasmine-console-reporter": "^3.1.0",
+    "nyc": "^14.1.1",
+    "ts-loader": "^6.2.0",
+    "ts-node": "^8.4.1",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
+  },
+  "nyc": {
+    "all": true,
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "spec/**/*",
+      "**/*.d.ts",
+      "**/*.config.js",
+      "coverage/**/*",
+      "dist/**/*",
+      "doc/**/*",
+      "scripts/**/*",
+      "src/darc/signer.ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  }
+}
