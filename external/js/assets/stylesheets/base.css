@@ -46,11 +46,11 @@ div#footer {
 	box-sizing: border-box;
 }
 
-body, html {
-	font-family: roboto,Helvetica,Arial,sans-serif;
+body, html, p {
+	font-family: 'Roboto',Helvetica,Arial,sans-serif;
 }
 
 pre, code {
-	font-family: roboto-mono,'Courier New', Courier, monospace;
+	font-family: 'Roboto Mono','Courier New', Courier, monospace;
 	font-size: 0.9em;
 }
