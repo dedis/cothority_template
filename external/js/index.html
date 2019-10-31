@@ -38,7 +38,7 @@
                         <h3> 3: set the darc</h3>
                         <p class="info">This will fetch the genesis DARC and internally save it for the future requests</p>
                         <div class="pure-form pure-form-stacked">
-                            Skip chain id: <input id="skipchainID" value="8b46622df9df1a89ce401147767c83c5130f8deaf20a0a1a58849e68e5bff268" />
+                            Skip chain id: <input id="skipchainID" />
                             <button class="pure-button" onclick='jsapp.getDarc("skipchainID")'>get the genesis darc</button>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                             You can then get the private key with the command <code>bcadmin key --print KEY_PATH</code>.
                         </p>
                         <div class="pure-form pure-form-stacked">
-                            Signer: <input id="signerID" value="bd457152388997809fa0a670401e1d55327eec7ee6dc434da3f4af1faef77801" />
+                            Signer: <input id="signerID" />
                             <button class="pure-button" onclick='jsapp.loadSigner("signerID")'>load the signer</button>
                         </div>
                     </div>

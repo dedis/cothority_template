@@ -36,17 +36,16 @@ export function displayStatus() {
             return;
         }
         const handler = Handler.getInstance();
-        const div = document.createElement("div");
+        let res = "Servers in the roster:";
         if (Handler.roster === undefined) {
             Handler.prependLog("handler has not been initialized");
             return;
         }
         Handler.roster.list.forEach( (element) => {
             const p = document.createElement("p");
-            p.innerText = element.address + ", " + element.description;
-            div.appendChild(p);
+            res += "\n" + element.address + ", " + element.description;
         });
-        Handler.prependLog(div);
+        Handler.prependLog(res);
     } catch (e) {
         Handler.prependLog("failed to display status: " + e);
     }
