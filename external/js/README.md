@@ -1,3 +1,47 @@
+# How to run this example
+
+In this example, you are going to run a webpage that lets you interact with the
+"keyvalue" contract defined in `cothority_template/byzcoin/keyvalue.go`.
+
+Note: you should have go installed before, see https://golang.org/doc/install.
+
+Clone this repo:
+
+```bash
+git clone https://github.com/dedis/cothority_template.git
+```
+
+Create a local distributed network of nodes:
+
+```bash
+# go to the conode folder
+cd cothority_template/conode
+# build the conode executable
+go build conode
+# run the nodes
+./run_nodes.sh -d tmp -v 3
+# now the nodes are runing in your terminal, open a new terminal to continue
+```
+
+Build the javascript app
+
+```bash
+cd cothority_template/external/js/
+# install the dependencies
+npm install
+# bundle the javascript (can take a while)
+npm run bundle
+```
+
+Now you can open in your browser the `cothority_template/external/js/index.html`
+file.
+
+If everything went well, you should be able to perform step `1.` by loading the
+file in `cothority_template/conode/tmp/public.toml`. Then you can display the
+roster info by doing step `2.`. To do the rest of the example you must create a
+new BycCoin with the `bcadmin`
+[utiliy](https://github.com/dedis/cothority/tree/master/byzcoin/bcadmin).
+
 # How to use the cothority JS library
 
 In this example, we are using `npm` as the package manager, `typescript` as the
