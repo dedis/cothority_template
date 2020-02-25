@@ -17,7 +17,7 @@ Create a local distributed network of nodes:
 # go to the conode folder
 cd cothority_template/conode
 # build the conode executable
-go build conode
+go build
 # run the nodes
 ./run_nodes.sh -d tmp -v 3
 # now the nodes are runing in your terminal, open a new terminal to continue
