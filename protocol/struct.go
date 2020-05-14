@@ -7,10 +7,24 @@ with the `*onet.TreeNode` embedded. The latter is used in the handler-function
 so that it can find out who sent the message.
 */
 
-import "go.dedis.ch/onet/v3"
+
+
+import (
+	"go.dedis.ch/onet/v3"
+	"go.dedis.ch/onet/v3/network"
+)
 
 // Name can be used from other packages to refer to this protocol.
 const Name = "Template"
+
+func init() {
+	for _, r := range []interface{}{
+		Announce{},
+		Reply{},
+	} {
+		network.RegisterMessage(r)
+	}
+}
 
 // Announce is used to pass a message to all children.
 type Announce struct {
