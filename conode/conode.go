@@ -25,6 +25,7 @@ import (
 
 	_ "github.com/dedis/cothority_template/byzcoin"
 
+	cli "github.com/urfave/cli"
 	"go.dedis.ch/cothority/v3"
 	status "go.dedis.ch/cothority/v3/status/service"
 	"go.dedis.ch/kyber/v3/util/encoding"
@@ -33,7 +34,6 @@ import (
 	"go.dedis.ch/onet/v3/cfgpath"
 	"go.dedis.ch/onet/v3/log"
 	"go.dedis.ch/onet/v3/network"
-	cli "gopkg.in/urfave/cli.v1"
 	// Here you can import any other needed service for your conode.
 	// For example, if your service needs cosi available in the server
 	// as well, uncomment this:
